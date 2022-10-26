@@ -3,19 +3,9 @@ import Head from 'next/head'
 
 const Home: NextPage = () => {
     return (
-        <div>
-            <Head>
-                <title>Marriage Game Points Calculator</title>
-                <meta name="description" content="Marriage Game Points / Maal Calculator"/>
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
-
-            <main>
-                <h1>
-                    Marriage Game Points Calculator
-                </h1>
-            </main>
-        </div>
+        <h1>
+            Marriage Game Points Calculator
+        </h1>
     )
 }
 
