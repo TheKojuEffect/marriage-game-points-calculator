@@ -7,6 +7,7 @@ const Home: NextPage = () => {
             <Head>
                 <title>Marriage Game Points Calculator</title>
                 <meta name="description" content="Marriage Game Points / Maal Calculator"/>
+                <link rel="icon" href="/favicon.ico" />
             </Head>
 
             <main>
