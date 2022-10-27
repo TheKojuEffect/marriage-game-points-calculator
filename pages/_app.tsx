@@ -1,5 +1,9 @@
 import type {AppProps} from 'next/app'
 import Head from "next/head";
+import {Card, CardContent, Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
+import {NavBar} from "../src/nav/NavBar";
+
+const theme = createTheme();
 
 function MyApp({Component, pageProps}: AppProps) {
     const title = "Marriage Game Points Calculator";
@@ -33,7 +37,17 @@ function MyApp({Component, pageProps}: AppProps) {
                 <meta property="og:url" content="https://marriage.koju.dev"/>
                 <meta property="og:image" content="https://marriage.koju.dev/icons/icon-512x512.png"/>
             </Head>
-            <Component {...pageProps} />
+            <ThemeProvider theme={theme}>
+                <CssBaseline/>
+                <Container maxWidth="sm" disableGutters>
+                    <NavBar/>
+                    <Card variant="outlined" sx={{m: 1}}>
+                        <CardContent>
+                            <Component {...pageProps} />
+                        </CardContent>
+                    </Card>
+                </Container>
+            </ThemeProvider>
         </>
 
     );
