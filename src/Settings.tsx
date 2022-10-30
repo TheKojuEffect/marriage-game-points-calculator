@@ -33,12 +33,13 @@ export const Settings: FC = () => {
     });
 
     const onSubmit = async (data: GameSettings) => {
+        const id = uuidV4();
         await db.games.add({
             createdAt: new Date(),
-            id: uuidV4(),
+            id,
             ...data
         })
-        void router.push('/players');
+        await router.push(`/${id}/players`);
     };
 
     return (

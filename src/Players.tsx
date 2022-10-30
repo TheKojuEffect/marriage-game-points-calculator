@@ -9,6 +9,8 @@ import ListItemText from "@mui/material/ListItemText";
 import {useFieldArray, useForm} from "react-hook-form";
 import {useRouter} from "next/router";
 import ListSubheader from "@mui/material/ListSubheader";
+import {db} from "./db";
+import {v4 as uuidV4} from 'uuid';
 
 type Player = {
     name?: String
@@ -18,7 +20,7 @@ type FormValues = {
     players: Player[];
 }
 
-export const Players: FC = () => {
+export const Players: FC<{ gameId: string }> = ({gameId}) => {
     const router = useRouter();
 
     const {register, control, handleSubmit, watch, formState: {errors}} = useForm<FormValues>({
@@ -48,11 +50,20 @@ export const Players: FC = () => {
         return valid;
     };
 
-    const onSubmit = ({players}: FormValues) => {
+    const onSubmit = async ({players}: FormValues) => {
         if (!validate(players)) {
             return;
         }
 
+        const addedPlayers = players.map(({name}, index) => ({
+            id: uuidV4(),
+            gameId,
+            index,
+            name: name as string
+        }));
+
+        await db.players.bulkAdd(addedPlayers);
+        await router.push(`/${gameId}/points`);
     }
 
     return (
