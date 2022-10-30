@@ -41,21 +41,15 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
         setShowError(false)
     };
 
-    const validate = (players: Player[]): boolean => {
+    const onSubmit = async ({players}: FormValues) => {
         const validPlayers = players.filter(player => player.name?.trim().length);
         const valid = validPlayers.length >= 2;
         if (!valid) {
             setShowError(true);
-        }
-        return valid;
-    };
-
-    const onSubmit = async ({players}: FormValues) => {
-        if (!validate(players)) {
             return;
         }
 
-        const addedPlayers = players.map(({name}, index) => ({
+        const addedPlayers = validPlayers.map(({name}, index) => ({
             id: uuidV4(),
             gameId,
             index,
