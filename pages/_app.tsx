@@ -2,6 +2,7 @@ import type {AppProps} from 'next/app'
 import Head from "next/head";
 import {Card, CardContent, Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import {NavBar} from "../src/nav/NavBar";
+import dynamic from "next/dynamic";
 
 const theme = createTheme();
 
@@ -53,4 +54,4 @@ function MyApp({Component, pageProps}: AppProps) {
     );
 }
 
-export default MyApp
+export default dynamic(() => Promise.resolve(MyApp), {ssr: false});
