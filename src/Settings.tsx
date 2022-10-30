@@ -1,4 +1,4 @@
-import {Box, Button, Divider, Stack, TextField} from "@mui/material";
+import {Box, Button, Stack, TextField} from "@mui/material";
 import {FC} from "react";
 import {useForm} from "react-hook-form";
 import {useRouter} from "next/router";
@@ -7,8 +7,10 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import {startCase} from "lodash";
+import {db} from "./db";
+import {v4 as uuidV4} from 'uuid';
 
-type GameSettings = {
+export interface GameSettings {
     pointRate: number;
     seenPoint: number;
     unseenPoint: number;
@@ -30,15 +32,24 @@ export const Settings: FC = () => {
         defaultValues: defaultGameSettings
     });
 
-    const onSubmit = (data: GameSettings) => {
-        console.log({data})
+    const onSubmit = async (data: GameSettings) => {
+        await db.games.add({
+            createdAt: new Date(),
+            id: uuidV4(),
+            ...data
+        })
+        void router.push('/players');
     };
 
     return (
         <Box>
             <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
                 <List
-                    subheader={<ListSubheader color="primary">New Game Settings</ListSubheader>}
+                    subheader={
+                        <ListSubheader color="primary">
+                            New Game Settings
+                        </ListSubheader>
+                    }
                 >
                     {
                         (Object.keys(defaultGameSettings) as (keyof GameSettings)[])
@@ -50,8 +61,9 @@ export const Settings: FC = () => {
                                         sx={{width: '7ch', textAlign: 'center'}}
                                         variant="outlined"
                                         required
+                                        type="number"
                                         size="small"
-                                        {...register(setting, {required: true, min: 0})}
+                                        {...register(setting, {required: true, min: 0, valueAsNumber: true})}
                                         error={!!errors[setting]}
                                     />
                                 </ListItem>
@@ -75,7 +87,7 @@ export const Settings: FC = () => {
                         variant="contained"
                         color="primary"
                     >
-                        Start
+                        Save
                     </Button>
                 </Stack>
             </Box>
