@@ -1,6 +1,6 @@
 import {Points} from "../../src/Points";
 import {useRouteGameId} from "../../src/useRouteGameId";
+import {NextPage} from "next";
 
-export default () => {
-    return <Points gameId={useRouteGameId()}/>;
-};
+const PointsPage: NextPage = () => <Points gameId={useRouteGameId()}/>;
+export default PointsPage;

@@ -1,3 +1,5 @@
 import {Settings} from "../src/Settings";
+import {NextPage} from "next";
 
-export default () => <Settings/>;
+const SettingsPage: NextPage = () => <Settings/>;
+export default SettingsPage;

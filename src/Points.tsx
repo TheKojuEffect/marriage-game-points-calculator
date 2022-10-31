@@ -47,7 +47,7 @@ export const Points: FC<GameIdProp> = ({gameId}) => {
 
     useEffect(() => {
         reset(getDefaultValues(players));
-    }, [players])
+    }, [players, reset])
 
     const {fields, update} = useFieldArray<FormValues>({control, name: "points"});
 
