@@ -22,7 +22,7 @@ export class AppDexie extends Dexie {
         super('marriage');
         this.version(1).stores({
             games: '&id,createdAt,pointRate,seenPoint,unseenPoint,dubleeWinBonusPoint,foulPoint',
-            players: '&id,[gameId+index],name'
+            players: '&id,gameId,index,name'
         })
     }
 }
