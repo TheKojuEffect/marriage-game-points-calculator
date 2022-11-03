@@ -23,7 +23,10 @@ export class AppDexie extends Dexie {
         this.version(1).stores({
             games: '&id,createdAt,pointRate,seenPoint,unseenPoint,dubleeWinBonusPoint,foulPoint',
             players: '&id,gameId,index,name'
-        })
+        });
+        // Do not change the schema directly once it's been in production
+        // Instead, create a new version and provide upgrade plan
+        // https://dexie.org/docs/Tutorial/Understanding-the-basics
     }
 }
 
