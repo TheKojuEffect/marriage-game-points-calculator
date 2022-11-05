@@ -18,13 +18,13 @@ export interface GameSettings {
     dubleeWinBonusPoint: number;
 }
 
-const defaultGameSettings: GameSettings = {
+export const defaultGameSettings: GameSettings = {
     pointRate: 1,
     seenPoint: 3,
     unseenPoint: 10,
     dubleeWinBonusPoint: 5,
     foulPoint: 15,
-}
+} as const;
 
 export const Settings: FC<GameIdProp> = ({gameId}) => {
     const router = useRouter();

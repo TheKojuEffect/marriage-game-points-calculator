@@ -1,47 +1,59 @@
 import {FC, useEffect} from "react";
 import {GameIdProp} from "./GameIdProp";
 import {useLiveQuery} from "dexie-react-hooks";
-import {db, Player} from "./db";
+import {db, DbPlayer, DbResult, DbRound, DbScore, generateId} from "./db";
 import Box from "@mui/material/Box";
-import {Button, FormControl, InputLabel, ListItem, MenuItem, Select, Stack, TextField} from "@mui/material";
+import {Button, FormControl, FormControlLabel, ListItem, MenuItem, Select, Stack, TextField} from "@mui/material";
 import ListSubheader from "@mui/material/ListSubheader";
 import {Controller, useFieldArray, useForm} from "react-hook-form";
 import List from "@mui/material/List";
 import ListItemText from "@mui/material/ListItemText";
+import Switch from '@mui/material/Switch';
+import {calculateScores} from "./calculateScores";
+import {useRouter} from "next/router";
 
-enum PlayerRoundStatus {
+export enum PlayerRoundStatus {
     UNSEEN = "Unseen",
     SEEN = "Seen",
     FOUL = "Foul",
-    FOLD = "Fold",
+    PAUSE = "Pause",
 }
 
-type FormValues = {
-    winnerPlayerId: string
-    points: {
+export interface Round {
+    winnerPlayerId: string;
+    dubleeWin: boolean;
+    results: {
         playerId: string,
         maal?: number,
         status: PlayerRoundStatus,
     }[]
 }
 
-export const Points: FC<GameIdProp> = ({gameId}) => {
+export const Results: FC<GameIdProp> = ({gameId}) => {
+    const router = useRouter();
     const players = useLiveQuery(() => {
         if (gameId) {
             return db.players
                 .where("gameId").equals(gameId)
-                .toArray()
-            // .sortBy("index")
+                .sortBy("index")
         }
         return [];
     }, [gameId]);
 
-    const getDefaultValues = (players: Player[] | undefined): FormValues => ({
-        winnerPlayerId: "",
-        points: players?.map(player => ({playerId: player.id, status: PlayerRoundStatus.UNSEEN})) || [],
+    const setting = useLiveQuery(() => {
+        if (gameId) {
+            return db.settings.get({gameId})
+        }
+        return undefined;
     });
 
-    const {handleSubmit, register, control, reset, formState: {errors}} = useForm<FormValues>({
+    const getDefaultValues = (players: DbPlayer[] | undefined): Round => ({
+        winnerPlayerId: "",
+        dubleeWin: false,
+        results: players?.map(player => ({playerId: player.id, status: PlayerRoundStatus.UNSEEN})) || [],
+    });
+
+    const {handleSubmit, register, control, reset, formState: {errors}} = useForm<Round>({
         defaultValues: getDefaultValues(players)
     });
 
@@ -49,10 +61,42 @@ export const Points: FC<GameIdProp> = ({gameId}) => {
         reset(getDefaultValues(players));
     }, [players, reset])
 
-    const {fields, update} = useFieldArray<FormValues>({control, name: "points"});
+    const {fields, update} = useFieldArray<Round>({control, name: "results"});
 
-    const onSubmit = (values: FormValues) => {
-        console.log({values});
+    const onSubmit = async (round: Round) => {
+
+        const roundId = generateId();
+        const dbRound: DbRound = {
+            id: roundId,
+            createdAt: new Date(),
+            gameId,
+            index: 0,
+            winnerPlayerId: round.winnerPlayerId,
+            dubleeWin: round.dubleeWin,
+        }
+
+        const dbResults: DbResult[] = round.results
+            .map(p => ({
+                roundId,
+                playerId: p.playerId,
+                maal: p.maal || 0,
+                status: p.status,
+            }));
+
+        const scores = calculateScores(round, setting!);
+        const dbScores: DbScore[] =
+            scores.map(score => ({
+                roundId,
+                ...score
+            }));
+
+        await db.transaction("rw", db.rounds, db.results, db.scores, async () => {
+            await db.rounds.add(dbRound);
+            await db.results.bulkAdd(dbResults);
+            await db.scores.bulkAdd(dbScores);
+        });
+        console.log(dbScores);
+        await router.push(`/${gameId}/scoreboard`);
     }
 
     return (
@@ -88,6 +132,19 @@ export const Points: FC<GameIdProp> = ({gameId}) => {
                         />
                     </FormControl>
                 </ListItem>
+                <ListItem>
+                    <FormControl size="small" sx={{width: 0.8}}>
+                        <Controller
+                            name="dubleeWin"
+                            control={control}
+                            render={({field}) =>
+                                <FormControlLabel
+                                    control={<Switch {...field} />}
+                                    labelPlacement="start"
+                                    label="Dublee Win"/>
+                            }/>
+                    </FormControl>
+                </ListItem>
                 {
                     fields.map((field, index) =>
 
@@ -99,15 +156,25 @@ export const Points: FC<GameIdProp> = ({gameId}) => {
                                 sx={{width: '10ch'}}
                             />
                             <Stack direction="row" spacing={2} sx={{width: 1}}>
+                                <TextField
+                                    inputProps={{style: {textAlign: "center"}}}
+                                    sx={{width: '7ch', textAlign: 'center'}}
+                                    variant="outlined"
+                                    label="Maal"
+                                    type="number"
+                                    size="small"
+                                    {...register(`results.${index}.maal` as const, {min: 0, valueAsNumber: true})}
+                                    error={!!(errors?.results && errors.results[index]?.maal)}
+                                />
                                 <FormControl size="small" sx={{width: 1 / 2}}>
                                     <Controller
-                                        name={`points.${index}.status` as const}
+                                        name={`results.${index}.status` as const}
                                         control={control}
                                         render={({field}) =>
                                             <Select
                                                 {...field}
-                                                {...register(`points.${index}.status` as const, {required: true})}
-                                                error={!!(errors?.points && errors.points[index]?.status)}
+                                                {...register(`results.${index}.status` as const, {required: true})}
+                                                error={!!(errors?.results && errors.results[index]?.status)}
                                             >
                                                 {
                                                     Object.values(PlayerRoundStatus)
@@ -123,16 +190,6 @@ export const Points: FC<GameIdProp> = ({gameId}) => {
                                         }
                                     />
                                 </FormControl>
-                                <TextField
-                                    inputProps={{style: {textAlign: "center"}}}
-                                    sx={{width: '7ch', textAlign: 'center'}}
-                                    variant="outlined"
-                                    label="Maal"
-                                    type="number"
-                                    size="small"
-                                    {...register(`points.${index}.maal` as const, {min: 0, valueAsNumber: true})}
-                                    error={!!(errors?.points && errors.points[index]?.maal)}
-                                />
                             </Stack>
                         </ListItem>
                     )
@@ -150,5 +207,6 @@ export const Points: FC<GameIdProp> = ({gameId}) => {
                 </Button>
             </Stack>
         </Box>
-    );
+    )
+        ;
 }
