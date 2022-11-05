@@ -16,6 +16,7 @@ import Box from "@mui/material/Box";
 import {Button, Stack, Tooltip} from "@mui/material";
 import {mergeWith} from "lodash";
 import Link from "next/link";
+import {useSettings} from "./useSettings";
 
 type PlayerPoints = Record<string, number>;
 type RoundPlayerPoints = Record<string, PlayerPoints>;
@@ -24,8 +25,9 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
     const rounds = useRounds(gameId);
     const scores = useScores(gameId);
     const players = usePlayers(gameId);
+    const settings = useSettings(gameId);
 
-    if (!rounds || !scores || !players) {
+    if (!rounds || !scores || !players || !settings) {
         return <Loading/>;
     }
 
@@ -44,6 +46,8 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
             (objValue: number = 0, srcValue: number = 0) => {
                 return objValue + srcValue;
             });
+
+    const amountFormat = new Intl.NumberFormat();
 
     return (
         <Box>
@@ -72,11 +76,13 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                         </TableRow>
                         <TableRow>
                             <TableCell>
-                                Amount
+                                Amount @{amountFormat.format(settings.pointRate)}/point
                             </TableCell>
                             {
                                 players.map(player =>
-                                    <TableCell key={player.id} align="center">0</TableCell>
+                                    <TableCell key={player.id} align="center">
+                                        {amountFormat.format(totalPlayerPoints[player.id] * settings.pointRate)}
+                                    </TableCell>
                                 )
                             }
 

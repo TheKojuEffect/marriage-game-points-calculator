@@ -3,4 +3,4 @@ import {useTableWithGameId} from "./useDb";
 
 export const useRounds = (gameId: string) =>
     useTableWithGameId(gameId, db.rounds)
-        ?.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+        ?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
