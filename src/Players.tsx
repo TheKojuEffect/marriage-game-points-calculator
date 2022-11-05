@@ -57,7 +57,7 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
         }));
 
         await db.players.bulkAdd(addedPlayers);
-        await router.push(`/${gameId}/results`);
+        await router.push(`/${gameId}/scores`);
     }
 
     return (

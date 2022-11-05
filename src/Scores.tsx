@@ -1,7 +1,7 @@
 import {FC, useEffect} from "react";
 import {GameIdProp} from "./GameIdProp";
 import {useLiveQuery} from "dexie-react-hooks";
-import {db, DbPlayer, DbResult, DbRound, DbScore, generateId} from "./db";
+import {db, DbPlayer, DbRound, DbScore, generateId} from "./db";
 import Box from "@mui/material/Box";
 import {Button, FormControl, FormControlLabel, ListItem, MenuItem, Select, Stack, TextField} from "@mui/material";
 import ListSubheader from "@mui/material/ListSubheader";
@@ -9,7 +9,7 @@ import {Controller, useFieldArray, useForm} from "react-hook-form";
 import List from "@mui/material/List";
 import ListItemText from "@mui/material/ListItemText";
 import Switch from '@mui/material/Switch';
-import {calculateScores} from "./calculateScores";
+import {calculatePoints} from "./calculatePoints";
 import {useRouter} from "next/router";
 
 export enum PlayerRoundStatus {
@@ -22,14 +22,14 @@ export enum PlayerRoundStatus {
 export interface Round {
     winnerPlayerId: string;
     dubleeWin: boolean;
-    results: {
+    scores: {
         playerId: string,
         maal?: number,
         status: PlayerRoundStatus,
     }[]
 }
 
-export const Results: FC<GameIdProp> = ({gameId}) => {
+export const Scores: FC<GameIdProp> = ({gameId}) => {
     const router = useRouter();
     const players = useLiveQuery(() => {
         if (gameId) {
@@ -50,7 +50,7 @@ export const Results: FC<GameIdProp> = ({gameId}) => {
     const getDefaultValues = (players: DbPlayer[] | undefined): Round => ({
         winnerPlayerId: "",
         dubleeWin: false,
-        results: players?.map(player => ({playerId: player.id, status: PlayerRoundStatus.UNSEEN})) || [],
+        scores: players?.map(player => ({playerId: player.id, status: PlayerRoundStatus.UNSEEN})) || [],
     });
 
     const {handleSubmit, register, control, reset, formState: {errors}} = useForm<Round>({
@@ -61,7 +61,7 @@ export const Results: FC<GameIdProp> = ({gameId}) => {
         reset(getDefaultValues(players));
     }, [players, reset])
 
-    const {fields, update} = useFieldArray<Round>({control, name: "results"});
+    const {fields, update} = useFieldArray<Round>({control, name: "scores"});
 
     const onSubmit = async (round: Round) => {
 
@@ -75,27 +75,21 @@ export const Results: FC<GameIdProp> = ({gameId}) => {
             dubleeWin: round.dubleeWin,
         }
 
-        const dbResults: DbResult[] = round.results
+        const playerPoints = calculatePoints(round, setting!);
+        const dbScores: DbScore[] = round.scores
             .map(p => ({
                 roundId,
                 playerId: p.playerId,
+                gameId,
                 maal: p.maal || 0,
                 status: p.status,
+                point: playerPoints[p.playerId] ?? 0,
             }));
 
-        const scores = calculateScores(round, setting!);
-        const dbScores: DbScore[] =
-            scores.map(score => ({
-                roundId,
-                ...score
-            }));
-
-        await db.transaction("rw", db.rounds, db.results, db.scores, async () => {
+        await db.transaction("rw", db.rounds, db.scores, db.scores, async () => {
             await db.rounds.add(dbRound);
-            await db.results.bulkAdd(dbResults);
             await db.scores.bulkAdd(dbScores);
         });
-        console.log(dbScores);
         await router.push(`/${gameId}/scoreboard`);
     }
 
@@ -163,18 +157,18 @@ export const Results: FC<GameIdProp> = ({gameId}) => {
                                     label="Maal"
                                     type="number"
                                     size="small"
-                                    {...register(`results.${index}.maal` as const, {min: 0, valueAsNumber: true})}
-                                    error={!!(errors?.results && errors.results[index]?.maal)}
+                                    {...register(`scores.${index}.maal` as const, {min: 0, valueAsNumber: true})}
+                                    error={!!(errors?.scores && errors.scores[index]?.maal)}
                                 />
                                 <FormControl size="small" sx={{width: 1 / 2}}>
                                     <Controller
-                                        name={`results.${index}.status` as const}
+                                        name={`scores.${index}.status` as const}
                                         control={control}
                                         render={({field}) =>
                                             <Select
                                                 {...field}
-                                                {...register(`results.${index}.status` as const, {required: true})}
-                                                error={!!(errors?.results && errors.results[index]?.status)}
+                                                {...register(`scores.${index}.status` as const, {required: true})}
+                                                error={!!(errors?.scores && errors.scores[index]?.status)}
                                             >
                                                 {
                                                     Object.values(PlayerRoundStatus)

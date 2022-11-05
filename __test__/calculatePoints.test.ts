@@ -1,137 +1,137 @@
-import {calculateScores, Score} from "../src/calculateScores";
-import {PlayerRoundStatus, Round} from "../src/Results";
+import {calculatePoints, PlayerPoints} from "../src/calculatePoints";
+import {PlayerRoundStatus, Round} from "../src/Scores";
 import {defaultGameSettings, GameSettings} from "../src/Settings";
 
-describe('calculateScores', () => {
+describe('calculatePoints', () => {
 
     describe('With default settings', () => {
-        type Scenario = { round: Round, scores: Score[] };
+        type Scenario = { round: Round, points: PlayerPoints };
 
         const scenarios: Scenario[] = [
             {
                 round: {
                     winnerPlayerId: "player1Id",
                     dubleeWin: false,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 1, status: PlayerRoundStatus.SEEN},
                         {playerId: "player2Id", maal: 0, status: PlayerRoundStatus.SEEN},
                     ],
                 },
-                scores: [
-                    {playerId: "player1Id", point: 4, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: -4, nextRoundPointAdjustment: 0},
-                ]
+                points: {
+                    player1Id: 4,
+                    player2Id: -4,
+                },
             },
 
             {
                 round: {
                     winnerPlayerId: "player1Id",
                     dubleeWin: false,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 1, status: PlayerRoundStatus.SEEN},
                         {playerId: "player2Id", maal: 5, status: PlayerRoundStatus.SEEN},
                     ],
                 },
-                scores: [
-                    {playerId: "player1Id", point: -1, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: 1, nextRoundPointAdjustment: 0},
-                ]
+                points: {
+                    player1Id: -1,
+                    player2Id: 1,
+                },
             },
 
             {
                 round: {
                     winnerPlayerId: "player2Id",
                     dubleeWin: false,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 1, status: PlayerRoundStatus.UNSEEN},
                         {playerId: "player2Id", maal: 5, status: PlayerRoundStatus.SEEN},
                         {playerId: "player3Id", maal: 5, status: PlayerRoundStatus.SEEN},
                     ],
                 },
-                scores: [
-                    {playerId: "player1Id", point: -21, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: 20, nextRoundPointAdjustment: 0},
-                    {playerId: "player3Id", point: 1, nextRoundPointAdjustment: 0},
-                ]
+                points: {
+                    player1Id: -21,
+                    player2Id: 20,
+                    player3Id: 1,
+                },
             },
 
             {
                 round: {
                     winnerPlayerId: "player2Id",
                     dubleeWin: false,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 0, status: PlayerRoundStatus.UNSEEN},
                         {playerId: "player2Id", maal: 0, status: PlayerRoundStatus.SEEN},
                         {playerId: "player3Id", maal: 0, status: PlayerRoundStatus.UNSEEN},
                     ],
                 },
-                scores: [
-                    {playerId: "player1Id", point: -10, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: 20, nextRoundPointAdjustment: 0},
-                    {playerId: "player3Id", point: -10, nextRoundPointAdjustment: 0},
-                ]
+                points: {
+                    player1Id: -10,
+                    player2Id: 20,
+                    player3Id: -10,
+                },
             },
 
             {
                 round: {
                     winnerPlayerId: "player2Id",
                     dubleeWin: false,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 5, status: PlayerRoundStatus.SEEN},
                         {playerId: "player2Id", maal: 6, status: PlayerRoundStatus.SEEN},
                         {playerId: "player3Id", maal: 0, status: PlayerRoundStatus.PAUSE},
                     ],
                 },
-                scores: [
-                    {playerId: "player1Id", point: -4, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: 4, nextRoundPointAdjustment: 0},
-                    {playerId: "player3Id", point: 0, nextRoundPointAdjustment: 0},
-                ]
+                points: {
+                    player1Id: -4,
+                    player2Id: 4,
+                    player3Id: 0,
+                },
             },
 
             {
                 round: {
                     winnerPlayerId: "player3Id",
                     dubleeWin: false,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 5, status: PlayerRoundStatus.SEEN},
                         {playerId: "player2Id", maal: 6, status: PlayerRoundStatus.SEEN},
                         {playerId: "player3Id", maal: 0, status: PlayerRoundStatus.SEEN},
                         {playerId: "player4Id", maal: 10, status: PlayerRoundStatus.SEEN},
                     ],
                 },
-                scores: [
-                    {playerId: "player1Id", point: -4, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: 0, nextRoundPointAdjustment: 0},
-                    {playerId: "player3Id", point: -12, nextRoundPointAdjustment: 0},
-                    {playerId: "player4Id", point: 16, nextRoundPointAdjustment: 0},
-                ]
+                points: {
+                    player1Id: -4,
+                    player2Id: 0,
+                    player3Id: -12,
+                    player4Id: 16,
+                },
             },
 
             {
                 round: {
                     winnerPlayerId: "player3Id",
                     dubleeWin: true,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 5, status: PlayerRoundStatus.SEEN},
                         {playerId: "player2Id", maal: 6, status: PlayerRoundStatus.SEEN},
                         {playerId: "player3Id", maal: 0, status: PlayerRoundStatus.SEEN},
                         {playerId: "player4Id", maal: 10, status: PlayerRoundStatus.SEEN},
                     ],
                 },
-                scores: [
-                    {playerId: "player1Id", point: -9, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: -5, nextRoundPointAdjustment: 0},
-                    {playerId: "player3Id", point: 3, nextRoundPointAdjustment: 0},
-                    {playerId: "player4Id", point: 11, nextRoundPointAdjustment: 0},
-                ]
+                points: {
+                    player1Id: -9,
+                    player2Id: -5,
+                    player3Id: 3,
+                    player4Id: 11,
+                },
             },
 
             {
                 round: {
                     winnerPlayerId: "player5Id",
                     dubleeWin: false,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 0, status: PlayerRoundStatus.UNSEEN},
                         {playerId: "player2Id", maal: 2, status: PlayerRoundStatus.SEEN},
                         {playerId: "player3Id", maal: 3, status: PlayerRoundStatus.SEEN},
@@ -139,20 +139,20 @@ describe('calculateScores', () => {
                         {playerId: "player5Id", maal: 5, status: PlayerRoundStatus.SEEN},
                     ],
                 },
-                scores: [
-                    {playerId: "player1Id", point: -24, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: -7, nextRoundPointAdjustment: 0},
-                    {playerId: "player3Id", point: -2, nextRoundPointAdjustment: 0},
-                    {playerId: "player4Id", point: 3, nextRoundPointAdjustment: 0},
-                    {playerId: "player5Id", point: 30, nextRoundPointAdjustment: 0},
-                ]
+                points: {
+                    player1Id: -24,
+                    player2Id: -7,
+                    player3Id: -2,
+                    player4Id: 3,
+                    player5Id: 30,
+                },
             },
 
             {
                 round: {
                     winnerPlayerId: "player5Id",
                     dubleeWin: true,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 0, status: PlayerRoundStatus.UNSEEN},
                         {playerId: "player2Id", maal: 2, status: PlayerRoundStatus.SEEN},
                         {playerId: "player3Id", maal: 3, status: PlayerRoundStatus.SEEN},
@@ -160,35 +160,35 @@ describe('calculateScores', () => {
                         {playerId: "player5Id", maal: 5, status: PlayerRoundStatus.SEEN},
                     ],
                 },
-                scores: [
-                    {playerId: "player1Id", point: -29, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: -12, nextRoundPointAdjustment: 0},
-                    {playerId: "player3Id", point: -7, nextRoundPointAdjustment: 0},
-                    {playerId: "player4Id", point: -2, nextRoundPointAdjustment: 0},
-                    {playerId: "player5Id", point: 50, nextRoundPointAdjustment: 0},
-                ]
+                points: {
+                    player1Id: -29,
+                    player2Id: -12,
+                    player3Id: -7,
+                    player4Id: -2,
+                    player5Id: 50,
+                },
             },
 
             {
                 round: {
                     winnerPlayerId: "player1Id",
                     dubleeWin: false,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 10, status: PlayerRoundStatus.SEEN},
                         {playerId: "player2Id", maal: 0, status: PlayerRoundStatus.FOUL},
                     ],
                 },
-                scores: [
-                    {playerId: "player1Id", point: 10, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: -10, nextRoundPointAdjustment: -15},
-                ]
+                points: {
+                    player1Id: 10,
+                    player2Id: -10,
+                },
             },
 
             {
                 round: {
                     winnerPlayerId: "player1Id",
                     dubleeWin: true,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 5, status: PlayerRoundStatus.SEEN},
                         {playerId: "player2Id", maal: 2, status: PlayerRoundStatus.SEEN},
                         {playerId: "player3Id", maal: 0, status: PlayerRoundStatus.FOUL},
@@ -196,33 +196,33 @@ describe('calculateScores', () => {
                         {playerId: "player5Id", maal: 0, status: PlayerRoundStatus.FOUL},
                     ],
                 },
-                scores: [
-                    {playerId: "player1Id", point: 51, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: -5, nextRoundPointAdjustment: 0},
-                    {playerId: "player3Id", point: -12, nextRoundPointAdjustment: -15},
-                    {playerId: "player4Id", point: -22, nextRoundPointAdjustment: 0},
-                    {playerId: "player5Id", point: -12, nextRoundPointAdjustment: -15},
-                ]
+                points: {
+                    player1Id: 51,
+                    player2Id: -5,
+                    player3Id: -12,
+                    player4Id: -22,
+                    player5Id: -12,
+                },
             },
         ];
 
-        scenarios.forEach(({round, scores}, index) =>
+        scenarios.forEach(({round, points}, index) =>
             it(`should calculate scores with default settings for scenario #${index}`, () => {
-                const calculatedScores = calculateScores(round, defaultGameSettings);
-                expect(calculatedScores).toEqual(expect.arrayContaining(scores));
+                const calculatedScores = calculatePoints(round, defaultGameSettings);
+                expect(calculatedScores).toEqual(expect.objectContaining(points));
             })
         );
     });
 
     describe('With Custom Settings', () => {
-        type Scenario = { round: Round, settings: GameSettings, scores: Score[] };
+        type Scenario = { round: Round, settings: GameSettings, points: PlayerPoints };
 
         const scenarios: Scenario[] = [
             {
                 round: {
                     winnerPlayerId: "player1Id",
                     dubleeWin: false,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 1, status: PlayerRoundStatus.SEEN},
                         {playerId: "player2Id", maal: 2, status: PlayerRoundStatus.SEEN},
                         {playerId: "player3Id", maal: 0, status: PlayerRoundStatus.UNSEEN},
@@ -236,19 +236,19 @@ describe('calculateScores', () => {
                     foulPoint: 20,
 
                 },
-                scores: [
-                    {playerId: "player1Id", point: 18, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: 0, nextRoundPointAdjustment: 0},
-                    {playerId: "player3Id", point: -15, nextRoundPointAdjustment: 0},
-                    {playerId: "player4Id", point: -3, nextRoundPointAdjustment: -20},
-                ]
+                points: {
+                    player1Id: 18,
+                    player2Id: 0,
+                    player3Id: -15,
+                    player4Id: -3,
+                },
             },
 
             {
                 round: {
                     winnerPlayerId: "player2Id",
                     dubleeWin: true,
-                    results: [
+                    scores: [
                         {playerId: "player1Id", maal: 1, status: PlayerRoundStatus.SEEN},
                         {playerId: "player2Id", maal: 2, status: PlayerRoundStatus.SEEN},
                         {playerId: "player3Id", maal: 0, status: PlayerRoundStatus.UNSEEN},
@@ -263,20 +263,20 @@ describe('calculateScores', () => {
                     foulPoint: 12,
                     dubleeWinBonusPoint: 8,
                 },
-                scores: [
-                    {playerId: "player1Id", point: -9, nextRoundPointAdjustment: 0},
-                    {playerId: "player2Id", point: 38, nextRoundPointAdjustment: 0},
-                    {playerId: "player3Id", point: -18, nextRoundPointAdjustment: 0},
-                    {playerId: "player4Id", point: -11, nextRoundPointAdjustment: -12},
-                    {playerId: "player5Id", point: 0, nextRoundPointAdjustment: 0},
-                ]
+                points: {
+                    player1Id: -9,
+                    player2Id: 38,
+                    player3Id: -18,
+                    player4Id: -11,
+                    player5Id: 0,
+                },
             },
         ];
 
-        scenarios.forEach(({round, settings, scores}, index) =>
+        scenarios.forEach(({round, settings, points}, index) =>
             it(`should calculate scores with custom settings for Scenario #${index}`, () => {
-                const calculatedScores = calculateScores(round, settings);
-                expect(calculatedScores).toEqual(expect.arrayContaining(scores));
+                const calculatedScores = calculatePoints(round, settings);
+                expect(calculatedScores).toEqual(expect.objectContaining(points));
             })
         );
     });

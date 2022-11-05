@@ -1,6 +1,6 @@
 import Dexie, {Table} from 'dexie';
 import {GameSettings} from "./Settings";
-import {PlayerRoundStatus} from "./Results";
+import {PlayerRoundStatus} from "./Scores";
 import {v4 as uuidV4} from "uuid";
 
 export interface DbGame {
@@ -28,18 +28,13 @@ export interface DbRound {
     dubleeWin: boolean
 }
 
-export interface DbResult {
-    roundId: string,
-    playerId: string,
-    maal: number,
-    status: PlayerRoundStatus,
-}
-
 export interface DbScore {
     roundId: string,
     playerId: string,
+    gameId: string,
+    maal: number,
+    status: PlayerRoundStatus,
     point: number,
-    nextRoundPointAdjustment: number,
 }
 
 export class AppDexie extends Dexie {
@@ -47,7 +42,6 @@ export class AppDexie extends Dexie {
     settings!: Table<DbSettings>;
     players!: Table<DbPlayer>;
     rounds!: Table<DbRound>;
-    results!: Table<DbResult>;
     scores!: Table<DbScore>;
 
     constructor() {
@@ -57,8 +51,7 @@ export class AppDexie extends Dexie {
             settings: '&gameId,pointRate,seenPoint,unseenPoint,dubleeWinBonusPoint,foulPoint',
             players: '&id,gameId,index,name',
             rounds: '&id,createdAt,index,gameId,winnerPlayerId,dubleeWin',
-            results: '[roundId+playerId],maal,status',
-            scores: '[roundId+playerId],point,nextRoundPointAdjustment',
+            scores: '[roundId+playerId],gameId,maal,status',
         });
         // Do not change the schema directly once it's been in production
         // Instead, create a new version and provide upgrade plan
