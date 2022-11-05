@@ -8,7 +8,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import {startCase} from "lodash";
 import {db} from "./db";
-import {v4 as uuidV4} from 'uuid';
+import {GameIdProp} from "./GameIdProp";
 
 export interface GameSettings {
     pointRate: number;
@@ -26,20 +26,18 @@ const defaultGameSettings: GameSettings = {
     foulPoint: 15,
 }
 
-export const Settings: FC = () => {
+export const Settings: FC<GameIdProp> = ({gameId}) => {
     const router = useRouter();
     const {register, handleSubmit, control, formState: {errors}} = useForm<GameSettings>({
         defaultValues: defaultGameSettings
     });
 
     const onSubmit = async (data: GameSettings) => {
-        const id = uuidV4();
-        await db.games.add({
-            createdAt: new Date(),
-            id,
+        await db.settings.add({
+            gameId,
             ...data
         })
-        await router.push(`/${id}/players`);
+        await router.push(`/${gameId}/players`);
     };
 
     return (
