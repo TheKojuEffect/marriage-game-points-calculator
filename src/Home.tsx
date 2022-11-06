@@ -2,6 +2,7 @@ import {Button, Stack} from "@mui/material";
 import {FC} from "react";
 import {useRouter} from "next/router";
 import {db, generateId} from "./db";
+import Link from "next/link";
 
 export const Home: FC = () => {
     const router = useRouter();
@@ -19,7 +20,9 @@ export const Home: FC = () => {
             <Button variant="contained" onClick={newGame}>New Game</Button>
             <Button variant="contained">Previous Games</Button>
             <Button variant="contained">Instructions</Button>
-            <Button variant="contained">About</Button>
+            <Link href="/about" legacyBehavior>
+                <Button variant="contained">About</Button>
+            </Link>
         </Stack>
     )
 };
