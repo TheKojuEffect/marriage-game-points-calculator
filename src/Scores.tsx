@@ -92,7 +92,7 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
                 point: playerPoints[p.playerId] ?? 0,
             }));
 
-        await db.transaction("rw", db.rounds, db.scores, db.scores, async () => {
+        await db.transaction("rw", db.rounds, db.scores, async () => {
             await db.rounds.add(dbRound);
             await db.scores.bulkAdd(dbScores);
         });

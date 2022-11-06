@@ -1,7 +1,7 @@
 import {useLiveQuery} from "dexie-react-hooks";
 import {Table} from "dexie";
 
-export const useQueryWithGameId = <T>(gameId: string, querier: () => Promise<T> | T): T | undefined =>
+export const useQueryWithGameId = <T>(gameId: string | undefined, querier: () => Promise<T> | T): T | undefined =>
     useLiveQuery(async () => {
         if (gameId) {
             return querier();

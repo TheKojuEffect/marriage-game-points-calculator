@@ -1,5 +1,7 @@
 import {useQueryWithGameId} from "./useDb";
 import {db, DbGame} from "./db";
 
-export const useGame = (gameId: string): DbGame | undefined =>
-    useQueryWithGameId(gameId, () => db.games.get({id: gameId}));
+export const getGameById = (gameId: string) => db.games.get({id: gameId});
+
+export const useGame = (gameId: string | undefined): DbGame | undefined =>
+    useQueryWithGameId(gameId, () => getGameById(gameId!));
