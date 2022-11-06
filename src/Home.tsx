@@ -19,7 +19,9 @@ export const Home: FC = () => {
         <Stack spacing={3}>
             <Button variant="contained" onClick={newGame}>New Game</Button>
             <Button variant="contained">Previous Games</Button>
-            <Button variant="contained">Instructions</Button>
+            <Link href="/instructions" legacyBehavior>
+                <Button variant="contained">Instructions</Button>
+            </Link>
             <Link href="/about" legacyBehavior>
                 <Button variant="contained">About</Button>
             </Link>
