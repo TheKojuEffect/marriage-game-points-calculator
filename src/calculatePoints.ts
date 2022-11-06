@@ -3,8 +3,13 @@ import {GameSettings} from "./Settings";
 import {sum, sumBy} from "lodash";
 
 export type PlayerPoints = Record<string, number>;
+export type PlayerStatus = Record<string, PlayerRoundStatus>;
 
-export const calculatePoints = (round: Round, setting: GameSettings): PlayerPoints => {
+export const calculatePoints = (
+    round: Round,
+    setting: GameSettings,
+    prevRoundPlayerStatus: PlayerStatus
+): PlayerPoints => {
     const nonWinners = round.scores.filter(({playerId}) => playerId !== round.winnerPlayerId);
     const totalMaal =
         sumBy(round.scores, p => p.maal || 0)
@@ -12,22 +17,23 @@ export const calculatePoints = (round: Round, setting: GameSettings): PlayerPoin
 
     const noOfRoundPlayers = sumBy(round.scores, p => p.status === PlayerRoundStatus.PAUSE ? 0 : 1);
 
-    const playerPoints: PlayerPoints = Object.fromEntries(nonWinners.map(({playerId, maal, status}) => {
-        switch (status) {
-            // Get Previous Round foul points
-        case PlayerRoundStatus.PAUSE:
-            return [playerId, 0];
+    const playerPoints: PlayerPoints =
+        Object.fromEntries(nonWinners.map(({playerId, maal, status}) => {
+            const prevRoundPointAdjustment = prevRoundPlayerStatus[playerId] === PlayerRoundStatus.FOUL ? -setting.foulPoint : 0;
+            switch (status) {
+            case PlayerRoundStatus.PAUSE:
+                return [playerId, prevRoundPointAdjustment];
 
-        case PlayerRoundStatus.UNSEEN:
-            return [playerId, -setting.unseenPoint - totalMaal];
+            case PlayerRoundStatus.UNSEEN:
+                return [playerId, -setting.unseenPoint - totalMaal + prevRoundPointAdjustment];
 
-        case PlayerRoundStatus.SEEN:
-            return [playerId, -setting.seenPoint - totalMaal + (maal || 0) * noOfRoundPlayers];
+            case PlayerRoundStatus.SEEN:
+                return [playerId, -setting.seenPoint - totalMaal + (maal || 0) * noOfRoundPlayers + prevRoundPointAdjustment];
 
-        case PlayerRoundStatus.FOUL:
-            return [playerId, -totalMaal];
-        }
-    }));
+            case PlayerRoundStatus.FOUL:
+                return [playerId, -totalMaal + prevRoundPointAdjustment];
+            }
+        }));
 
     const winnerPlayerPoint: PlayerPoints = {[round.winnerPlayerId]: -sum(Object.values(playerPoints))};
 

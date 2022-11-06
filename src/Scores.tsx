@@ -1,6 +1,5 @@
 import {FC, useEffect} from "react";
 import {GameIdProp} from "./GameIdProp";
-import {useLiveQuery} from "dexie-react-hooks";
 import {db, DbPlayer, DbRound, DbScore, generateId} from "./db";
 import Box from "@mui/material/Box";
 import {Button, FormControl, FormControlLabel, ListItem, MenuItem, Select, Stack, TextField} from "@mui/material";
@@ -9,8 +8,13 @@ import {Controller, useFieldArray, useForm} from "react-hook-form";
 import List from "@mui/material/List";
 import ListItemText from "@mui/material/ListItemText";
 import Switch from '@mui/material/Switch';
-import {calculatePoints} from "./calculatePoints";
+import {calculatePoints, PlayerStatus} from "./calculatePoints";
 import {useRouter} from "next/router";
+import {usePlayers} from "./usePlayers";
+import {useSettings} from "./useSettings";
+import {useRounds} from "./useRounds";
+import {head} from "lodash";
+import {Loading} from "./Loading";
 
 export enum PlayerRoundStatus {
     UNSEEN = "Unseen",
@@ -31,21 +35,10 @@ export interface Round {
 
 export const Scores: FC<GameIdProp> = ({gameId}) => {
     const router = useRouter();
-    const players = useLiveQuery(() => {
-        if (gameId) {
-            return db.players
-                .where("gameId").equals(gameId)
-                .sortBy("index")
-        }
-        return [];
-    }, [gameId]);
-
-    const setting = useLiveQuery(() => {
-        if (gameId) {
-            return db.settings.get({gameId})
-        }
-        return undefined;
-    });
+    const players = usePlayers(gameId);
+    const settings = useSettings(gameId);
+    const rounds = useRounds(gameId);
+    const prevRound = head(rounds);
 
     const getDefaultValues = (players: DbPlayer[] | undefined): Round => ({
         winnerPlayerId: "",
@@ -63,6 +56,18 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
 
     const {fields, update} = useFieldArray<Round>({control, name: "scores"});
 
+    if (!players || !settings || !rounds) {
+        return <Loading/>;
+    }
+
+    const getPlayerStatusInRound = async (round: DbRound | undefined): Promise<PlayerStatus> => {
+        if (round) {
+            const prevScores = await db.scores.where("roundId").equals(round.id).toArray();
+            return Object.fromEntries(prevScores.map(s => [s.playerId, s.status]));
+        }
+        return {};
+    }
+
     const onSubmit = async (round: Round) => {
 
         const roundId = generateId();
@@ -75,7 +80,8 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
             dubleeWin: round.dubleeWin,
         }
 
-        const playerPoints = calculatePoints(round, setting!);
+        const playerStatusInPrevRound = await getPlayerStatusInRound(prevRound);
+        const playerPoints = calculatePoints(round, settings, playerStatusInPrevRound);
         const dbScores: DbScore[] = round.scores
             .map(p => ({
                 roundId,
@@ -91,7 +97,7 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
             await db.scores.bulkAdd(dbScores);
         });
         await router.push(`/${gameId}/scoreboard`);
-    }
+    };
 
     return (
         <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -201,6 +207,5 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
                 </Button>
             </Stack>
         </Box>
-    )
-        ;
+    );
 }

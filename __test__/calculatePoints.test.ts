@@ -1,4 +1,4 @@
-import {calculatePoints, PlayerPoints} from "../src/calculatePoints";
+import {calculatePoints, PlayerPoints, PlayerStatus} from "../src/calculatePoints";
 import {PlayerRoundStatus, Round} from "../src/Scores";
 import {defaultGameSettings, GameSettings} from "../src/Settings";
 
@@ -208,7 +208,7 @@ describe('calculatePoints', () => {
 
         scenarios.forEach(({round, points}, index) =>
             it(`should calculate scores with default settings for scenario #${index}`, () => {
-                const calculatedScores = calculatePoints(round, defaultGameSettings);
+                const calculatedScores = calculatePoints(round, defaultGameSettings, {});
                 expect(calculatedScores).toEqual(expect.objectContaining(points));
             })
         );
@@ -275,13 +275,87 @@ describe('calculatePoints', () => {
 
         scenarios.forEach(({round, settings, points}, index) =>
             it(`should calculate scores with custom settings for Scenario #${index}`, () => {
-                const calculatedScores = calculatePoints(round, settings);
+                const calculatedScores = calculatePoints(round, settings, {});
                 expect(calculatedScores).toEqual(expect.objectContaining(points));
             })
         );
     });
 
     describe('With nextRoundPointAdjustment', () => {
-        // TODO:
+        type Scenario = { round: Round, prevRoundPlayerStatus: PlayerStatus, points: PlayerPoints };
+
+        const scenarios: Scenario[] = [
+            {
+                round: {
+                    winnerPlayerId: "player1Id",
+                    dubleeWin: false,
+                    scores: [
+                        {playerId: "player1Id", maal: 1, status: PlayerRoundStatus.SEEN},
+                        {playerId: "player2Id", maal: 2, status: PlayerRoundStatus.SEEN},
+                        {playerId: "player3Id", maal: 0, status: PlayerRoundStatus.UNSEEN},
+                        {playerId: "player4Id", maal: 0, status: PlayerRoundStatus.FOUL},
+                    ],
+                },
+                prevRoundPlayerStatus: {
+                    player1Id: PlayerRoundStatus.SEEN,
+                    player2Id: PlayerRoundStatus.SEEN,
+                    player3Id: PlayerRoundStatus.FOUL,
+                    player4Id: PlayerRoundStatus.FOUL,
+                },
+                points: {
+                    player1Id: 44,
+                    player2Id: 2,
+                    player3Id: -28,
+                    player4Id: -18,
+                },
+            },
+
+            {
+                round: {
+                    winnerPlayerId: "player4Id",
+                    dubleeWin: false,
+                    scores: [
+                        {playerId: "player1Id", maal: 1, status: PlayerRoundStatus.SEEN},
+                        {playerId: "player4Id", maal: 6, status: PlayerRoundStatus.SEEN},
+                    ],
+                },
+                prevRoundPlayerStatus: {
+                    player1Id: PlayerRoundStatus.SEEN,
+                    player4Id: PlayerRoundStatus.FOUL,
+                },
+                points: {
+                    player1Id: -8,
+                    player4Id: 8,
+                },
+            },
+            {
+                round: {
+                    winnerPlayerId: "player1Id",
+                    dubleeWin: false,
+                    scores: [
+                        {playerId: "player1Id", maal: 1, status: PlayerRoundStatus.SEEN},
+                        {playerId: "player2Id", maal: 0, status: PlayerRoundStatus.SEEN},
+                        {playerId: "player4Id", maal: 0, status: PlayerRoundStatus.PAUSE},
+                    ],
+                },
+                prevRoundPlayerStatus: {
+                    player1Id: PlayerRoundStatus.SEEN,
+                    player2Id: PlayerRoundStatus.SEEN,
+                    player4Id: PlayerRoundStatus.FOUL,
+                },
+                points: {
+                    player1Id: 19,
+                    player2Id: -4,
+                    player4Id: -15,
+                },
+            },
+        ];
+
+        scenarios.forEach(({round, points, prevRoundPlayerStatus}, index) =>
+            it(`should calculate scores with prev round for Scenario #${index}`, () => {
+                const calculatedScores = calculatePoints(round, defaultGameSettings, prevRoundPlayerStatus);
+                expect(calculatedScores).toEqual(expect.objectContaining(points));
+            })
+        );
     });
 })
