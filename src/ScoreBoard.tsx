@@ -1,4 +1,4 @@
-import {FC} from "react";
+import {FC, useState} from "react";
 import {GameIdProp} from "./GameIdProp";
 import {usePlayers} from "./usePlayers";
 import {useScores} from "./useScores";
@@ -13,21 +13,29 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {DbPlayer, DbRound} from "./db";
 import Box from "@mui/material/Box";
-import {Button, Stack, Tooltip} from "@mui/material";
+import {Button, Stack, TextField, Tooltip} from "@mui/material";
 import {mergeWith} from "lodash";
 import Link from "next/link";
 import {useSettings} from "./useSettings";
+import {useGame} from "./useGame";
+import {encode} from "./codec";
+import {useRouter} from "next/router";
+import {GameData} from "./Shared";
 
 type PlayerPoints = Record<string, number>;
 type RoundPlayerPoints = Record<string, PlayerPoints>;
 
 export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
+    const game = useGame(gameId);
     const rounds = useRounds(gameId);
     const scores = useScores(gameId);
     const players = usePlayers(gameId);
     const settings = useSettings(gameId);
 
-    if (!rounds || !scores || !players || !settings) {
+    const router = useRouter();
+    const [shareUrl, setShareUrl] = useState('');
+
+    if (!game || !rounds || !scores || !players || !settings) {
         return <Loading/>;
     }
 
@@ -48,6 +56,20 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
             });
 
     const amountFormat = new Intl.NumberFormat();
+
+    const shareGame = async () => {
+        const gameData: GameData = {game, settings, players, rounds, scores};
+        const param = encode(gameData);
+        const url = `${window.location.origin}/shared/${param}`;
+        if (navigator.share) {
+            await navigator.share({
+                title: "Continue the Marriage Game",
+                url
+            });
+        } else {
+            setShareUrl(url);
+        }
+    }
 
     return (
         <Box>
@@ -94,7 +116,17 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                 <Link href={`/${gameId}/scores`} legacyBehavior>
                     <Button variant="contained">Next Round</Button>
                 </Link>
-                <Button variant="contained">Continue in Another Device</Button>
+                <Button variant="contained" onClick={shareGame}>Share and Continue In Another Device</Button>
+
+                {
+                    shareUrl &&
+                    <TextField variant="outlined"
+                               label="Share the URL to continue in another device"
+                               multiline
+                               maxRows={2}
+                               InputProps={{readOnly: true}} defaultValue={shareUrl}/>
+                }
+
             </Stack>
             <TableContainer component={Paper}>
                 <Table>
