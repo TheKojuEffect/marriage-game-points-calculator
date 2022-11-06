@@ -7,33 +7,30 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import {Container} from "@mui/material";
 import Link from "next/link";
+import {AppIcon} from "./AppIcon";
 
 export const NavBar: FC = () => (
     <Box sx={{flexGrow: 1}}>
         <AppBar position="fixed">
             <Container maxWidth="md" disableGutters>
                 <Toolbar>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        sx={{mr: 2}}
-                    >
-                        <MenuIcon/>
-                    </IconButton>
                     <Link href="/" legacyBehavior>
-                        <Typography variant="h6"
-                                    component="a"
-                                    sx={{
-                                        flexGrow: 1,
-                                        cursor: "pointer",
-                                        caretColor: "transparent",
-                                        textDecoration: "none",
-                                    }}
-                        >
-                            Marriage
-                        </Typography>
+                        <Box>
+                            <IconButton>
+                                <AppIcon fontSize="large"/>
+                            </IconButton>
+                            <Typography variant="h6"
+                                        component="a"
+                                        sx={{
+                                            flexGrow: 1,
+                                            cursor: "pointer",
+                                            caretColor: "transparent",
+                                            textDecoration: "none",
+                                        }}
+                            >
+                                Marriage
+                            </Typography>
+                        </Box>
                     </Link>
                 </Toolbar>
             </Container>
