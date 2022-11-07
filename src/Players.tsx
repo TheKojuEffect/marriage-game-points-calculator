@@ -1,20 +1,23 @@
 import {Alert, Button, Collapse, ListItem, Snackbar, Stack, TextField} from "@mui/material";
-import {FC, useState} from "react";
+import {FC, useEffect, useState} from "react";
 import Box from "@mui/material/Box";
 import {TransitionGroup} from "react-transition-group";
 import List from "@mui/material/List";
 import IconButton from "@mui/material/IconButton";
-import {Clear, Save} from "@mui/icons-material";
+import {Clear, PersonAdd, Save} from "@mui/icons-material";
 import ListItemText from "@mui/material/ListItemText";
 import {useFieldArray, useForm} from "react-hook-form";
 import {useRouter} from "next/router";
 import ListSubheader from "@mui/material/ListSubheader";
 import {db, generateId} from "./db";
 import {LoadingButton} from "@mui/lab";
-import {uniqBy} from "lodash";
+import {isEmpty, uniqBy} from "lodash";
+import {usePlayers} from "./usePlayers";
 
 type Player = {
-    name?: String
+    name?: String;
+    gameId?: string;
+    index?: number;
 }
 
 type FormValues = {
@@ -24,8 +27,11 @@ type FormValues = {
 export const Players: FC<{ gameId: string }> = ({gameId}) => {
     const router = useRouter();
     const [saving, setSaving] = useState(false);
+    const [showError, setShowError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const existingPlayers = usePlayers(gameId);
 
-    const {register, control, handleSubmit, watch, formState: {errors}} = useForm<FormValues>({
+    const {register, control, handleSubmit, reset, formState: {errors}} = useForm<FormValues>({
         mode: "onBlur",
         defaultValues: {
             players: Array(6).fill({})
@@ -37,8 +43,11 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
         name: "players"
     });
 
-    const [showError, setShowError] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+    useEffect(() => {
+        if (!isEmpty(existingPlayers)) {
+            reset({players: existingPlayers})
+        }
+    }, [existingPlayers]);
 
     const handleErrorClose = () => {
         setShowError(false)
@@ -59,12 +68,14 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
             return;
         }
 
-        const addedPlayers = validPlayers.map(({name}, index) => ({
-            id: generateId(),
-            gameId,
-            index,
-            name: name as string
-        }));
+        const addedPlayers = validPlayers
+            .filter(p => p.gameId === undefined)
+            .map(({name}, index) => ({
+                id: generateId(),
+                gameId,
+                index: index + (existingPlayers?.length ?? 0),
+                name: name as string
+            }));
 
         setSaving(true);
         await db.players.bulkAdd(addedPlayers);
@@ -87,6 +98,7 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
                                         tabIndex={-1}
                                         aria-label="delete"
                                         title="Delete"
+                                        disabled={field.gameId !== undefined}
                                         onClick={() => update(index, {})}
                                     >
                                         <Clear/>
@@ -105,7 +117,7 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
                                         width: '14ch',
                                         textAlign: 'left'
                                     }}
-                                    variant="outlined"
+                                    variant={field.gameId ? "filled" : "outlined"}
                                     size="small"
                                     {...register(`players.${index}.name` as const, {maxLength: 10})}
                                     error={!!(errors?.players && errors.players[index]?.name)}
@@ -130,6 +142,7 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
                     fullWidth
                     variant="outlined"
                     color="primary"
+                    startIcon={<PersonAdd/>}
                     onClick={() => append({})}
                 >
                     Add
@@ -143,7 +156,7 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
                     startIcon={<Save/>}
                     color="primary"
                 >
-                    Start
+                    Save
                 </LoadingButton>
             </Stack>
             <Snackbar open={showError}
