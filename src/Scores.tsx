@@ -196,12 +196,13 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
                                     render={({field}) =>
                                         <TextField
                                             inputProps={{style: {textAlign: "center"}}}
-                                            sx={{width: '7ch', textAlign: 'center'}}
+                                            sx={{width: '9ch', textAlign: 'center'}}
                                             variant="outlined"
                                             label="Maal"
                                             type="number"
                                             size="small"
-                                            {...register(`scores.${index}.maal` as const, {min: 0, valueAsNumber: true})}
+                                            required
+                                            {...register(`scores.${index}.maal` as const, {min: 0, valueAsNumber: true, required: true})}
                                             onChange={(event) => {
                                                 field.onChange(event);
                                                 const {value} = event.target;
