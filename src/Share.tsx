@@ -23,7 +23,7 @@ const isGameData = (data: any): data is GameData => {
         && gameData.scores !== undefined;
 }
 
-export const Shared: FC<{ game: string | undefined }> = ({game}) => {
+export const Share: FC<{ game: string | undefined }> = ({game}) => {
     const router = useRouter()
     const [updatingDb, setUpdatingDb] = useState(false);
     const [processed, setProcessed] = useState(false);
@@ -57,7 +57,7 @@ export const Shared: FC<{ game: string | undefined }> = ({game}) => {
 
     const gotoHome = () => router.push("/");
 
-    const gotoScoreboard = (gameId: string) => router.push(`/${gameId}/scoreboard`);
+    const gotoScoreboard = (gameId: string) => router.push(`/scoreboard?gameId=${gameId}`);
 
     if (!validData) {
         return (

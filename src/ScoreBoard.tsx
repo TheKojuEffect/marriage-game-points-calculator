@@ -20,7 +20,7 @@ import {useSettings} from "./useSettings";
 import {useGame} from "./useGame";
 import {encode} from "./codec";
 import {useRouter} from "next/router";
-import {GameData} from "./Shared";
+import {GameData} from "./Share";
 
 type PlayerPoints = Record<string, number>;
 type RoundPlayerPoints = Record<string, PlayerPoints>;
@@ -60,7 +60,7 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
     const shareGame = async () => {
         const gameData: GameData = {game, settings, players, rounds, scores};
         const param = encode(gameData);
-        const url = `${window.location.origin}/shared/${param}`;
+        const url = `${window.location.origin}/share?game=${param}`;
         if (navigator.share) {
             await navigator.share({
                 title: "Continue the Marriage Game",
@@ -113,7 +113,7 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                 </Table>
             </TableContainer>
             <Stack spacing={3} sx={{my: 3}}>
-                <Link href={`/${gameId}/scores`} legacyBehavior>
+                <Link href={`/scores?gameId=${gameId}`} legacyBehavior>
                     <Button variant="contained">Next Round</Button>
                 </Link>
                 <Button variant="contained" onClick={shareGame}>Share and Continue In Another Device</Button>

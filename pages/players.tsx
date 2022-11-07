@@ -1,7 +1,7 @@
-import {Players} from "../../src/Players";
+import {Players} from "../src/Players";
 import {NextPage} from "next";
-import {LoadingUntilRouterReady} from "../../src/LoadingUntilRouterReady";
-import {getGameId} from "../../src/getGameId";
+import {LoadingUntilRouterReady} from "../src/LoadingUntilRouterReady";
+import {getGameId} from "../src/getGameId";
 
 const PlayersPage: NextPage = () =>
     <LoadingUntilRouterReady onReady={query =>

@@ -37,7 +37,7 @@ export const Settings: FC<GameIdProp> = ({gameId}) => {
             gameId,
             ...data
         })
-        await router.push(`/${gameId}/players`);
+        await router.push(`/players?gameId=${gameId}`);
     };
 
     return (

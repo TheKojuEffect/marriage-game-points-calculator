@@ -96,7 +96,7 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
             await db.rounds.add(dbRound);
             await db.scores.bulkAdd(dbScores);
         });
-        await router.push(`/${gameId}/scoreboard`);
+        await router.push(`/scoreboard?gameId=${gameId}`);
     };
 
     return (

@@ -12,7 +12,7 @@ export const Home: FC = () => {
             id: gameId,
             createdAt: new Date(),
         });
-        await router.push(`/${gameId}/settings`);
+        await router.push(`/settings?gameId=${gameId}`);
     }
 
     return (
