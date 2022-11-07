@@ -1,10 +1,10 @@
-import {FC, useEffect, useState} from "react";
+import {FC, useEffect, useRef, useState} from "react";
 import {decode} from "./codec";
 import {db, DbGame, DbPlayer, DbRound, DbScore, DbSettings} from "./db";
 import {useRouter} from "next/router";
 import {Loading} from "./Loading";
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle} from "@mui/material";
-import {useGame} from "./useGame";
+import {getGameById} from "./useGame";
 
 export interface GameData {
     game: DbGame,
@@ -23,41 +23,84 @@ const isGameData = (data: any): data is GameData => {
         && gameData.scores !== undefined;
 }
 
-export const Share: FC<{ game: string | undefined }> = ({game}) => {
+export const Share: FC<{ game: string }> = ({game}) => {
     const router = useRouter()
-    const [updatingDb, setUpdatingDb] = useState(false);
+    const dbPopulated = useRef(false);
     const [processed, setProcessed] = useState(false);
     const [validData, setValidData] = useState(false);
+    const [existingGame, setExistingGame] = useState(false);
     const [gameData, setGameData] = useState<GameData | undefined>(undefined);
 
-    useEffect(() => {
-        if (!game) {
-            return;
+    const gotoHome = () => router.push("/");
+    const gotoScoreboard = (gameId: string) => router.push(`/scoreboard?gameId=${gameId}`);
+
+    const saveGameData = async ({
+        game,
+        settings,
+        players,
+        rounds,
+        scores
+    }: GameData) => {
+        await db.transaction("rw", db.games, db.settings, db.players, db.rounds, db.scores, async () => {
+            await db.games.add(game);
+            await db.settings.add(settings);
+            await db.players.bulkAdd(players);
+            await db.rounds.bulkAdd(rounds);
+            await db.scores.bulkAdd(scores);
+        });
+    };
+
+    const deleteExitingGameData = async (gameId: string) => {
+        await db.transaction("rw", db.games, db.settings, db.players, db.rounds, db.scores, async () => {
+            await db.games.where("id").equals(gameId).delete();
+            await db.settings.where("gameId").equals(gameId).delete();
+            await db.players.where("gameId").equals(gameId).delete();
+            await db.rounds.where("gameId").equals(gameId).delete();
+            await db.scores.where("gameId").equals(gameId).delete();
+        });
+    };
+
+    const overwriteExistingGame = async () => {
+        await deleteExitingGameData(gameData?.game.id!);
+        await saveGameData(gameData!);
+        await gotoScoreboard(gameData!.game.id);
+    }
+
+    const continueGame = async (gameData: GameData) => {
+        if (!dbPopulated.current) {
+            dbPopulated.current = true;
+            await saveGameData(gameData!);
+            await gotoScoreboard(gameData!.game.id);
         }
+    }
+
+    useEffect(() => {
         try {
             const data = decode(game);
             const valid = isGameData(data);
             setValidData(valid);
             if (valid) {
                 setGameData(data);
+                const gameId = data.game.id;
+                getGameById(gameId)
+                    .then(dbGame => {
+                        if (dbGame) {
+                            setExistingGame(true);
+                        } else {
+                            void continueGame(data);
+                        }
+                    });
             }
         } catch (ex) {
             setValidData(false);
         } finally {
             setProcessed(true);
         }
-    }, [game]);
+    }, []);
 
-    const gameId = gameData?.game.id;
-    const existingGame = useGame(gameId);
-
-    if (!game || !processed || updatingDb) {
+    if (!processed) {
         return <Loading/>
     }
-
-    const gotoHome = () => router.push("/");
-
-    const gotoScoreboard = (gameId: string) => router.push(`/scoreboard?gameId=${gameId}`);
 
     if (!validData) {
         return (
@@ -78,46 +121,6 @@ export const Share: FC<{ game: string | undefined }> = ({game}) => {
         );
     }
 
-    const saveGameData = async ({
-        game,
-        settings,
-        players,
-        rounds,
-        scores
-    }: GameData) => {
-        await db.transaction("rw", db.games, db.settings, db.players, db.rounds, db.scores, async () => {
-            await db.games.add(game);
-            await db.settings.add(settings);
-            await db.players.bulkAdd(players);
-            await db.rounds.bulkAdd(rounds);
-            await db.scores.bulkAdd(scores);
-        });
-        setUpdatingDb(false);
-    }
-
-    const deleteExitingGameData = async (gameId: string) => {
-        await db.transaction("rw", db.games, db.settings, db.players, db.rounds, db.scores, async () => {
-            await db.games.where("id").equals(gameId).delete();
-            await db.settings.where("gameId").equals(gameId).delete();
-            await db.players.where("gameId").equals(gameId).delete();
-            await db.rounds.where("gameId").equals(gameId).delete();
-            await db.scores.where("gameId").equals(gameId).delete();
-        });
-    }
-
-    const continueGame = async () => {
-        setUpdatingDb(true);
-        await saveGameData(gameData!);
-        await gotoScoreboard(gameData!.game.id);
-    }
-
-    const overwriteExistingGame = async () => {
-        setUpdatingDb(true);
-        await deleteExitingGameData(existingGame!.id);
-        await saveGameData(gameData!);
-        await gotoScoreboard(gameData!.game.id);
-    }
-
     if (existingGame) {
         return (
             <Dialog
@@ -131,33 +134,11 @@ export const Share: FC<{ game: string | undefined }> = ({game}) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={gotoHome}>Go to Home</Button>
-                    <Button variant="outlined" color="info" onClick={() => gotoScoreboard(existingGame.id)}>View Existing</Button>
+                    <Button variant="outlined" color="info" onClick={() => gotoScoreboard(gameData?.game.id!)}>View Existing</Button>
                     <Button variant="outlined" color="warning" onClick={overwriteExistingGame}>Overwrite</Button>
                 </DialogActions>
             </Dialog>
         );
     }
-
-
-    if (validData && !existingGame) {
-        return (
-            <Dialog
-                open={true}
-            >
-                <DialogTitle>
-                    Continue Game
-                </DialogTitle>
-                <DialogContent>
-                    Do you want to continue this shared game?
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={gotoHome}>Go to Home</Button>
-                    <Button variant="outlined" color="success" onClick={continueGame}>Continue</Button>
-                </DialogActions>
-            </Dialog>
-        );
-    }
-
     return <Loading/>;
-
 }
