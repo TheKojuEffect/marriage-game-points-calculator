@@ -1,6 +1,10 @@
 import {Players} from "../../src/Players";
-import {useRouteGameId} from "../../src/useRouteGameId";
 import {NextPage} from "next";
+import {LoadingUntilRouterReady} from "../../src/LoadingUntilRouterReady";
+import {getGameId} from "../../src/getGameId";
 
-const PlayersPage: NextPage = () => <Players gameId={useRouteGameId()}/>;
+const PlayersPage: NextPage = () =>
+    <LoadingUntilRouterReady onReady={query =>
+        <Players gameId={getGameId(query)}/>
+    }/>;
 export default PlayersPage;

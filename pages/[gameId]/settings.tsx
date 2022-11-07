@@ -1,6 +1,11 @@
 import {Settings} from "../../src/Settings";
 import {NextPage} from "next";
-import {useRouteGameId} from "../../src/useRouteGameId";
+import {LoadingUntilRouterReady} from "../../src/LoadingUntilRouterReady";
+import {getGameId} from "../../src/getGameId";
 
-const SettingsPage: NextPage = () => <Settings gameId={useRouteGameId()}/>;
+const SettingsPage: NextPage = () =>
+    <LoadingUntilRouterReady onReady={query =>
+        <Settings gameId={getGameId(query)}/>
+    }/>;
+
 export default SettingsPage;
