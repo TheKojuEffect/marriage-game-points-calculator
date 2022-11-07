@@ -107,7 +107,7 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
     return (
         <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
             <List
-                subheader={<ListSubheader color="primary">Round #1</ListSubheader>}
+                subheader={<ListSubheader color="primary">Round #{rounds.length + 1}</ListSubheader>}
             >
                 <ListItem>
                     <ListItemText primary="Winner"/>
