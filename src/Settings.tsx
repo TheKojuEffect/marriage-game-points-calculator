@@ -94,7 +94,7 @@ export const Settings: FC<GameIdProp> = ({gameId}) => {
                         color="primary"
                         onClick={router.back}
                     >
-                        Cancel
+                        Back
                     </Button>
                     <LoadingButton
                         type="submit"

@@ -4,13 +4,13 @@ import Box from "@mui/material/Box";
 import {TransitionGroup} from "react-transition-group";
 import List from "@mui/material/List";
 import IconButton from "@mui/material/IconButton";
-import {Clear} from "@mui/icons-material";
+import {Clear, Save} from "@mui/icons-material";
 import ListItemText from "@mui/material/ListItemText";
 import {useFieldArray, useForm} from "react-hook-form";
 import {useRouter} from "next/router";
 import ListSubheader from "@mui/material/ListSubheader";
-import {db} from "./db";
-import {v4 as uuidV4} from 'uuid';
+import {db, generateId} from "./db";
+import {LoadingButton} from "@mui/lab";
 
 type Player = {
     name?: String
@@ -22,6 +22,7 @@ type FormValues = {
 
 export const Players: FC<{ gameId: string }> = ({gameId}) => {
     const router = useRouter();
+    const [saving, setSaving] = useState(false);
 
     const {register, control, handleSubmit, watch, formState: {errors}} = useForm<FormValues>({
         mode: "onBlur",
@@ -50,13 +51,15 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
         }
 
         const addedPlayers = validPlayers.map(({name}, index) => ({
-            id: uuidV4(),
+            id: generateId(),
             gameId,
             index,
             name: name as string
         }));
 
+        setSaving(true);
         await db.players.bulkAdd(addedPlayers);
+        setSaving(false);
         await router.push(`/scores?gameId=${gameId}`);
     }
 
@@ -72,6 +75,7 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
                                 secondaryAction={
                                     <IconButton
                                         edge="end"
+                                        tabIndex={-1}
                                         aria-label="delete"
                                         title="Delete"
                                         onClick={() => update(index, {})}
@@ -82,11 +86,19 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
                             >
                                 <ListItemText primary={`Player ${index + 1}`}/>
                                 <TextField
-                                    inputProps={{style: {textAlign: "left"}}}
-                                    sx={{width: '20ch', textAlign: 'left'}}
+                                    inputProps={{
+                                        maxLength: 10,
+                                        style: {
+                                            textAlign: "left"
+                                        }
+                                    }}
+                                    sx={{
+                                        width: '14ch',
+                                        textAlign: 'left'
+                                    }}
                                     variant="outlined"
                                     size="small"
-                                    {...register(`players.${index}.name` as const,)}
+                                    {...register(`players.${index}.name` as const, {maxLength: 10})}
                                     error={!!(errors?.players && errors.players[index]?.name)}
                                 />
                             </ListItem>
@@ -113,14 +125,17 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
                 >
                     Add
                 </Button>
-                <Button
+                <LoadingButton
                     type="submit"
                     fullWidth
                     variant="contained"
+                    loading={saving}
+                    loadingPosition="start"
+                    startIcon={<Save/>}
                     color="primary"
                 >
                     Start
-                </Button>
+                </LoadingButton>
             </Stack>
             <Snackbar open={showError}
                       anchorOrigin={{
