@@ -104,10 +104,13 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
         await router.push(`/scoreboard?gameId=${gameId}`);
     };
 
+    const changeStatusToSeen = (index: number) => {
+        setValue(`scores.${index}.status`, PlayerRoundStatus.SEEN);
+    }
     const onSelectWinner = (playerId: string) => {
         if (playerId) {
             const index = fields.findIndex(f => f.playerId === playerId);
-            setValue(`scores.${index}.status`, PlayerRoundStatus.SEEN);
+            changeStatusToSeen(index);
         }
     }
 
@@ -128,8 +131,8 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
                                     displayEmpty
                                     {...register("winnerPlayerId", {required: true})}
                                     onChange={(event) => {
+                                        field.onChange(event);
                                         const playerId = event.target.value;
-                                        field.onChange(playerId);
                                         onSelectWinner(playerId);
                                     }}
                                     error={!!errors?.winnerPlayerId}
@@ -173,15 +176,28 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
                                 sx={{width: '10ch'}}
                             />
                             <Stack direction="row" spacing={2} sx={{width: 1}}>
-                                <TextField
-                                    inputProps={{style: {textAlign: "center"}}}
-                                    sx={{width: '7ch', textAlign: 'center'}}
-                                    variant="outlined"
-                                    label="Maal"
-                                    type="number"
-                                    size="small"
-                                    {...register(`scores.${index}.maal` as const, {min: 0, valueAsNumber: true})}
-                                    error={!!(errors?.scores && errors.scores[index]?.maal)}
+                                <Controller
+                                    name={`scores.${index}.maal` as const}
+                                    control={control}
+                                    render={({field}) =>
+                                        <TextField
+                                            inputProps={{style: {textAlign: "center"}}}
+                                            sx={{width: '7ch', textAlign: 'center'}}
+                                            variant="outlined"
+                                            label="Maal"
+                                            type="number"
+                                            size="small"
+                                            {...register(`scores.${index}.maal` as const, {min: 0, valueAsNumber: true})}
+                                            onChange={(event) => {
+                                                field.onChange(event);
+                                                const {value} = event.target;
+                                                if (parseInt(value) > 0) {
+                                                    changeStatusToSeen(index);
+                                                }
+                                            }}
+                                            error={!!(errors?.scores && errors.scores[index]?.maal)}
+                                        />
+                                    }
                                 />
                                 <FormControl size="small" sx={{width: 1 / 2}}>
                                     <Controller
