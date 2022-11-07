@@ -11,6 +11,7 @@ import {useRouter} from "next/router";
 import ListSubheader from "@mui/material/ListSubheader";
 import {db, generateId} from "./db";
 import {LoadingButton} from "@mui/lab";
+import {uniqBy} from "lodash";
 
 type Player = {
     name?: String
@@ -37,6 +38,7 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
     });
 
     const [showError, setShowError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleErrorClose = () => {
         setShowError(false)
@@ -44,8 +46,15 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
 
     const onSubmit = async ({players}: FormValues) => {
         const validPlayers = players.filter(player => player.name?.trim().length);
+        const hasDuplicateNames = uniqBy(validPlayers, p => p.name).length !== validPlayers.length;
+        if (hasDuplicateNames) {
+            setErrorMessage("Please enter unique names.");
+            setShowError(true);
+            return;
+        }
         const valid = validPlayers.length >= 2;
         if (!valid) {
+            setErrorMessage("Please enter at least 2 players.");
             setShowError(true);
             return;
         }
@@ -144,7 +153,7 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
                       }}
                       autoHideDuration={2000} onClose={handleErrorClose}>
                 <Alert onClose={handleErrorClose} severity="error" sx={{width: '100%'}}>
-                    Please enter at least 2 players.
+                    {errorMessage}
                 </Alert>
             </Snackbar>
         </Box>
