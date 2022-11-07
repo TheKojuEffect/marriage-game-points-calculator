@@ -114,6 +114,12 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
         }
     }
 
+    const onStatusChange = (index: number, status: PlayerRoundStatus) => {
+        if (status !== PlayerRoundStatus.SEEN) {
+            update(index, {maal: 0, status, playerId: fields[index].playerId})
+        }
+    }
+
     return (
         <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
             <List
@@ -207,6 +213,11 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
                                             <Select
                                                 {...field}
                                                 {...register(`scores.${index}.status` as const, {required: true})}
+                                                onChange={(event) => {
+                                                    field.onChange(event);
+                                                    const status = event.target.value;
+                                                    onStatusChange(index, status as PlayerRoundStatus);
+                                                }}
                                                 error={!!(errors?.scores && errors.scores[index]?.status)}
                                             >
                                                 {
