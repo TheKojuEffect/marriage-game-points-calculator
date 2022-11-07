@@ -1,5 +1,5 @@
 import {Box, Button, Stack, TextField} from "@mui/material";
-import {FC, useRef} from "react";
+import {FC, useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {useRouter} from "next/router";
 import List from '@mui/material/List';
@@ -7,10 +7,11 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import {startCase} from "lodash";
-import {db} from "./db";
+import {db, DbSettings} from "./db";
 import {GameIdProp} from "./GameIdProp";
 import {LoadingButton} from "@mui/lab";
 import {Save} from "@mui/icons-material";
+import {useSettings} from "./useSettings";
 
 export interface GameSettings {
     pointRate: number;
@@ -30,18 +31,25 @@ export const defaultGameSettings: GameSettings = {
 
 export const Settings: FC<GameIdProp> = ({gameId}) => {
     const router = useRouter();
-    const saving = useRef(false);
-    const {register, handleSubmit, control, formState: {errors}} = useForm<GameSettings>({
-        defaultValues: defaultGameSettings
+    const [saving, setSaving] = useState(false);
+    const existingSettings = useSettings(gameId);
+    const readOnly = Boolean(existingSettings);
+    const {register, handleSubmit, control, reset, formState: {errors}} = useForm<DbSettings>({
+        defaultValues: {gameId, ...defaultGameSettings}
     });
 
-    const onSubmit = async (data: GameSettings) => {
-        saving.current = true
+    useEffect(() => {
+        if (existingSettings) {
+            reset(existingSettings);
+        }
+    }, [existingSettings])
+
+    const onSubmit = async (settings: DbSettings) => {
+        setSaving(true)
         await db.settings.add({
-            gameId,
-            ...data
+            ...settings
         })
-        saving.current = false
+        setSaving(false);
         await router.push(`/players?gameId=${gameId}`);
     };
 
@@ -63,10 +71,13 @@ export const Settings: FC<GameIdProp> = ({gameId}) => {
                                     <TextField
                                         inputProps={{style: {textAlign: "center"}}}
                                         sx={{width: '7ch', textAlign: 'center'}}
-                                        variant="outlined"
                                         required
                                         type="number"
                                         size="small"
+                                        variant={readOnly ? "filled" : "outlined"}
+                                        InputProps={{
+                                            readOnly,
+                                        }}
                                         {...register(setting, {required: true, min: 0, valueAsNumber: true})}
                                         error={!!errors[setting]}
                                     />
@@ -88,10 +99,11 @@ export const Settings: FC<GameIdProp> = ({gameId}) => {
                     <LoadingButton
                         type="submit"
                         fullWidth
+                        disabled={readOnly}
                         variant="contained"
-                        loading={saving.current}
+                        loading={saving}
                         loadingPosition="start"
-                        startIcon={<Save />}
+                        startIcon={<Save/>}
                         color="primary"
                     >
                         Save
