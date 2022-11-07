@@ -2,7 +2,7 @@ import {FC, useEffect, useState} from "react";
 import {GameIdProp} from "./GameIdProp";
 import {db, DbPlayer, DbRound, DbScore, generateId} from "./db";
 import Box from "@mui/material/Box";
-import {Button, FormControl, FormControlLabel, ListItem, MenuItem, Select, Stack, TextField} from "@mui/material";
+import {FormControl, FormControlLabel, ListItem, MenuItem, Select, Stack, TextField} from "@mui/material";
 import ListSubheader from "@mui/material/ListSubheader";
 import {Controller, useFieldArray, useForm} from "react-hook-form";
 import List from "@mui/material/List";
@@ -50,7 +50,7 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
         scores: players?.map(player => ({playerId: player.id, status: PlayerRoundStatus.UNSEEN})) || [],
     });
 
-    const {handleSubmit, register, control, reset, formState: {errors}} = useForm<Round>({
+    const {handleSubmit, register, control, reset, setValue, formState: {errors}} = useForm<Round>({
         defaultValues: getDefaultValues(players)
     });
 
@@ -104,6 +104,13 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
         await router.push(`/scoreboard?gameId=${gameId}`);
     };
 
+    const onSelectWinner = (playerId: string) => {
+        if (playerId) {
+            const index = fields.findIndex(f => f.playerId === playerId);
+            setValue(`scores.${index}.status`, PlayerRoundStatus.SEEN);
+        }
+    }
+
     return (
         <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
             <List
@@ -120,6 +127,11 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
                                     {...field}
                                     displayEmpty
                                     {...register("winnerPlayerId", {required: true})}
+                                    onChange={(event) => {
+                                        const playerId = event.target.value;
+                                        field.onChange(playerId);
+                                        onSelectWinner(playerId);
+                                    }}
                                     error={!!errors?.winnerPlayerId}
                                 >
                                     <MenuItem value={""}>Select Winner</MenuItem>
