@@ -1,4 +1,4 @@
-import {FC, useEffect} from "react";
+import {FC, useEffect, useState} from "react";
 import {GameIdProp} from "./GameIdProp";
 import {db, DbPlayer, DbRound, DbScore, generateId} from "./db";
 import Box from "@mui/material/Box";
@@ -15,6 +15,8 @@ import {useSettings} from "./useSettings";
 import {useRounds} from "./useRounds";
 import {head} from "lodash";
 import {Loading} from "./Loading";
+import {LoadingButton} from "@mui/lab";
+import {Calculate} from "@mui/icons-material";
 
 export enum PlayerRoundStatus {
     UNSEEN = "Unseen",
@@ -39,6 +41,8 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
     const settings = useSettings(gameId);
     const rounds = useRounds(gameId);
     const prevRound = head(rounds);
+
+    const [saving, setSaving] = useState(false);
 
     const getDefaultValues = (players: DbPlayer[] | undefined): Round => ({
         winnerPlayerId: "",
@@ -69,7 +73,7 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
     }
 
     const onSubmit = async (round: Round) => {
-
+        setSaving(true);
         const roundId = generateId();
         const dbRound: DbRound = {
             id: roundId,
@@ -96,6 +100,7 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
             await db.rounds.add(dbRound);
             await db.scores.bulkAdd(dbScores);
         });
+        setSaving(false);
         await router.push(`/scoreboard?gameId=${gameId}`);
     };
 
@@ -197,14 +202,17 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
             </List>
 
             <Stack direction="row" spacing={2}>
-                <Button
+                <LoadingButton
                     type="submit"
                     fullWidth
                     variant="contained"
                     color="primary"
+                    loading={saving}
+                    loadingPosition="start"
+                    startIcon={<Calculate/>}
                 >
                     Calculate
-                </Button>
+                </LoadingButton>
             </Stack>
         </Box>
     );
