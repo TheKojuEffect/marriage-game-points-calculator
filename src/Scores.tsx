@@ -17,6 +17,7 @@ import {head} from "lodash";
 import {Loading} from "./Loading";
 import {LoadingButton} from "@mui/lab";
 import {Calculate} from "@mui/icons-material";
+import {useRoundScores} from "./useScores";
 
 export enum PlayerRoundStatus {
     UNSEEN = "Unseen",
@@ -25,41 +26,70 @@ export enum PlayerRoundStatus {
     PAUSE = "Pause",
 }
 
+type RoundScore = {
+    playerId: string,
+    maal?: number,
+    status: PlayerRoundStatus,
+};
+
 export interface Round {
     winnerPlayerId: string;
     dubleeWin: boolean;
-    scores: {
-        playerId: string,
-        maal?: number,
-        status: PlayerRoundStatus,
-    }[]
+    scores: RoundScore[]
 }
 
-export const Scores: FC<GameIdProp> = ({gameId}) => {
+type ScoresProps = GameIdProp & {
+    roundId?: string
+};
+
+export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
     const router = useRouter();
     const players = usePlayers(gameId);
     const settings = useSettings(gameId);
     const rounds = useRounds(gameId);
-    const prevRound = head(rounds);
-
+    const round = rounds?.find(r => r.id === roundId);
+    const roundScores = useRoundScores(roundId)
+    const prevRound = round ? rounds?.find(r => r.createdAt < round.createdAt) : head(rounds);
+    const prevRoundScores = useRoundScores(prevRound?.id);
     const [saving, setSaving] = useState(false);
+    const readOnly = !!round;
 
-    const getDefaultValues = (players: DbPlayer[] | undefined): Round => ({
-        winnerPlayerId: "",
-        dubleeWin: false,
-        scores: players?.map(player => ({playerId: player.id, status: PlayerRoundStatus.UNSEEN})) || [],
+    const playerIndex: Record<string, number> =
+        Object.fromEntries(players?.map(p => [p.id, p.index]) ?? []);
+
+    const prevRoundPlayerStatus: PlayerStatus =
+        Object.fromEntries(prevRoundScores?.map(s => [s.playerId, s.status]) ?? []);
+
+    const getDefaultScores = (): RoundScore[] => {
+        if (round && roundScores) {
+            return roundScores.map(score => ({playerId: score.playerId, maal: score.maal, status: score.status}))
+                .sort((s1, s2) => playerIndex[s1.playerId] - playerIndex[s2.playerId]);
+        }
+        return players?.map(player => {
+            const pause = prevRoundPlayerStatus[player.id] === PlayerRoundStatus.PAUSE;
+            return ({
+                playerId: player.id,
+                maal: pause ? 0 : undefined,
+                status: pause ? PlayerRoundStatus.PAUSE : PlayerRoundStatus.UNSEEN
+            });
+        }) ?? [];
+    }
+    const getDefaultValues = (): Round => ({
+        winnerPlayerId: round?.winnerPlayerId || "",
+        dubleeWin: round?.dubleeWin || false,
+        scores: getDefaultScores(),
     });
 
     const {handleSubmit, register, control, reset, setValue, getValues, formState: {errors}} =
         useForm<Round>({
-            defaultValues: getDefaultValues(players)
+            defaultValues: getDefaultValues()
         });
 
-    useEffect(() => {
-        reset(getDefaultValues(players));
-    }, [players, reset])
-
     const {fields, update} = useFieldArray<Round>({control, name: "scores"});
+
+    useEffect(() => {
+        reset(getDefaultValues());
+    }, [players, round, roundScores, prevRoundScores])
 
     if (!players || !settings || !rounds) {
         return <Loading/>;
