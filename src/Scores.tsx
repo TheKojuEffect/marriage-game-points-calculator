@@ -50,9 +50,10 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
         scores: players?.map(player => ({playerId: player.id, status: PlayerRoundStatus.UNSEEN})) || [],
     });
 
-    const {handleSubmit, register, control, reset, setValue, formState: {errors}} = useForm<Round>({
-        defaultValues: getDefaultValues(players)
-    });
+    const {handleSubmit, register, control, reset, setValue, getValues, formState: {errors}} =
+        useForm<Round>({
+            defaultValues: getDefaultValues(players)
+        });
 
     useEffect(() => {
         reset(getDefaultValues(players));
@@ -115,8 +116,15 @@ export const Scores: FC<GameIdProp> = ({gameId}) => {
     }
 
     const onStatusChange = (index: number, status: PlayerRoundStatus) => {
+        const playerId = fields[index].playerId;
         if (status !== PlayerRoundStatus.SEEN) {
-            update(index, {maal: 0, status, playerId: fields[index].playerId})
+            update(index, {maal: 0, status, playerId})
+        }
+
+        if (![PlayerRoundStatus.SEEN, PlayerRoundStatus.FOUL].includes(status)) {
+            if (getValues("winnerPlayerId") === playerId) {
+                setValue("winnerPlayerId", "");
+            }
         }
     }
 
