@@ -1,5 +1,5 @@
 import {Box, Button, Stack, TextField} from "@mui/material";
-import {FC} from "react";
+import {FC, useRef} from "react";
 import {useForm} from "react-hook-form";
 import {useRouter} from "next/router";
 import List from '@mui/material/List';
@@ -9,6 +9,8 @@ import ListSubheader from '@mui/material/ListSubheader';
 import {startCase} from "lodash";
 import {db} from "./db";
 import {GameIdProp} from "./GameIdProp";
+import {LoadingButton} from "@mui/lab";
+import {Save} from "@mui/icons-material";
 
 export interface GameSettings {
     pointRate: number;
@@ -28,15 +30,18 @@ export const defaultGameSettings: GameSettings = {
 
 export const Settings: FC<GameIdProp> = ({gameId}) => {
     const router = useRouter();
+    const saving = useRef(false);
     const {register, handleSubmit, control, formState: {errors}} = useForm<GameSettings>({
         defaultValues: defaultGameSettings
     });
 
     const onSubmit = async (data: GameSettings) => {
+        saving.current = true
         await db.settings.add({
             gameId,
             ...data
         })
+        saving.current = false
         await router.push(`/players?gameId=${gameId}`);
     };
 
@@ -80,14 +85,17 @@ export const Settings: FC<GameIdProp> = ({gameId}) => {
                     >
                         Cancel
                     </Button>
-                    <Button
+                    <LoadingButton
                         type="submit"
                         fullWidth
                         variant="contained"
+                        loading={saving.current}
+                        loadingPosition="start"
+                        startIcon={<Save />}
                         color="primary"
                     >
                         Save
-                    </Button>
+                    </LoadingButton>
                 </Stack>
             </Box>
         </Box>
