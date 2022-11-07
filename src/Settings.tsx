@@ -46,9 +46,11 @@ export const Settings: FC<GameIdProp> = ({gameId}) => {
 
     const onSubmit = async (settings: DbSettings) => {
         setSaving(true)
-        await db.settings.add({
-            ...settings
-        })
+        if (!existingSettings) {
+            await db.settings.add({
+                ...settings
+            });
+        }
         setSaving(false);
         await router.push(`/players?gameId=${gameId}`);
     };
@@ -99,14 +101,13 @@ export const Settings: FC<GameIdProp> = ({gameId}) => {
                     <LoadingButton
                         type="submit"
                         fullWidth
-                        disabled={readOnly}
                         variant="contained"
                         loading={saving}
                         loadingPosition="start"
                         startIcon={<Save/>}
                         color="primary"
                     >
-                        Save
+                        Ok
                     </LoadingButton>
                 </Stack>
             </Box>

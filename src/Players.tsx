@@ -156,7 +156,7 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
                     startIcon={<Save/>}
                     color="primary"
                 >
-                    Save
+                    Ok
                 </LoadingButton>
             </Stack>
             <Snackbar open={showError}
