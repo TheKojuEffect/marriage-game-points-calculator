@@ -1,7 +1,8 @@
 import {Button} from "@mui/material";
 import {useRouter} from "next/router";
-import {db, generateId} from "./db";
+import {db} from "./db";
 import {FC} from "react";
+import {generateId} from "./utils";
 
 export const NewGame: FC = () => {
     const router = useRouter();

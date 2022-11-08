@@ -1,6 +1,6 @@
 import {FC, useCallback, useEffect, useState} from "react";
 import {GameIdProp} from "./GameIdProp";
-import {db, DbRound, DbScore, generateId} from "./db";
+import {db, DbRound, DbScore} from "./db";
 import Box from "@mui/material/Box";
 import {Button, FormControl, FormControlLabel, ListItem, MenuItem, Select, Stack, TextField, Tooltip} from "@mui/material";
 import ListSubheader from "@mui/material/ListSubheader";
@@ -17,6 +17,7 @@ import {Calculate, PersonAdd} from "@mui/icons-material";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import {usePlayers, useRounds, useRoundScores, useSettings} from "./useDb";
+import {generateId} from "./utils";
 
 export enum PlayerRoundStatus {
     UNSEEN = "Unseen",

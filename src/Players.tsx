@@ -9,10 +9,11 @@ import ListItemText from "@mui/material/ListItemText";
 import {useFieldArray, useForm} from "react-hook-form";
 import {useRouter} from "next/router";
 import ListSubheader from "@mui/material/ListSubheader";
-import {db, generateId} from "./db";
+import {db} from "./db";
 import {LoadingButton} from "@mui/lab";
 import {isEmpty, uniqBy} from "lodash";
 import {usePlayers} from "./useDb";
+import {generateId} from "./utils";
 
 type Player = {
     name?: String;

@@ -1,7 +1,6 @@
 import Dexie, {Table} from 'dexie';
 import {GameSettings} from "./Settings";
 import {PlayerRoundStatus} from "./Scores";
-import {v4 as uuidV4} from "uuid";
 
 export interface DbGame {
     id: string;
@@ -58,5 +57,4 @@ export class AppDexie extends Dexie {
     }
 }
 
-export const generateId = () => uuidV4();
 export const db = new AppDexie();
