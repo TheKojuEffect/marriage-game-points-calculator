@@ -82,7 +82,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                 status: pause ? PlayerRoundStatus.PAUSE : PlayerRoundStatus.UNSEEN
             };
         }) ?? [];
-    }, [round, roundScores, players]);
+    }, [round, roundScores, players, prevRoundScores]);
 
     const getDefaultValues = useCallback((): Round => ({
         winnerPlayerId: round?.winnerPlayerId || "",
