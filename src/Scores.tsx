@@ -22,10 +22,10 @@ import Typography from "@mui/material/Typography";
 import Link from "next/link";
 
 export enum PlayerRoundStatus {
-    UNSEEN,
-    SEEN,
-    FOUL,
-    PAUSE,
+    UNSEEN = "Unseen",
+    SEEN = "Seen",
+    FOUL = "Foul",
+    PAUSE = "Pause",
 }
 
 type RoundScore = {

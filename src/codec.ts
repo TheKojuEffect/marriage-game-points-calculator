@@ -2,6 +2,7 @@ import {compressToEncodedURIComponent, decompressFromEncodedURIComponent} from "
 import {GameData} from "./Share";
 import {groupBy, sortBy} from "lodash";
 import {DbGame, DbPlayer, DbRound, DbScore, DbSettings} from "./db";
+import {PlayerRoundStatus} from "./Scores";
 
 type GameId = string;
 type PlayerId = string;
@@ -20,6 +21,12 @@ type NormalizedGameData = [
     [NormPlayer[]],
     [NormRound[]]
 ];
+
+const toStatusIndex = (status: PlayerRoundStatus): number =>
+    Object.values(PlayerRoundStatus).indexOf(status);
+
+const fromStatusIndex = (index: number): PlayerRoundStatus =>
+    Object.values(PlayerRoundStatus)[index];
 
 const toNormGame = (game: DbGame): NormGame =>
     [game.id, game.createdAt];
@@ -50,12 +57,12 @@ const fromNormPlayers = (normPlayers: NormPlayer[], {id: gameId}: DbGame): DbPla
     });
 
 const toNormScores = (scores: DbScore[]): NormScore[] =>
-    scores.map(s => [s.playerId, s.maal, s.status, s.point]);
+    scores.map(s => [s.playerId, s.maal, toStatusIndex(s.status), s.point]);
 
 const fromNormScores = (normScores: NormScore[], {id: roundId, gameId}: DbRound): DbScore[] =>
     normScores.map(normScore => {
         const [playerId, maal, status, point] = normScore;
-        return {roundId, gameId, playerId, maal, status, point};
+        return {roundId, gameId, playerId, maal, status: fromStatusIndex(status), point};
     });
 
 const toNormRounds = (rounds: DbRound[], roundScores: Record<RoundId, DbScore[]>): NormRound[] =>

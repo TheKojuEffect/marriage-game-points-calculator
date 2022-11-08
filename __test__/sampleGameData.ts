@@ -1,4 +1,5 @@
 import {GameData} from "../src/Share";
+import {PlayerRoundStatus} from "../src/Scores";
 
 export const sampleGameData: GameData = {
     "game": {
@@ -107,7 +108,7 @@ export const sampleGameData: GameData = {
             "playerId": "020ced81-7d09-4d9a-9980-946e61154a72",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 8,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": 34
         },
         {
@@ -115,7 +116,7 @@ export const sampleGameData: GameData = {
             "playerId": "265e83ca-3e82-49ac-912c-42cd6de16ce2",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 0,
+            "status": PlayerRoundStatus.UNSEEN,
             "point": -21
         },
         {
@@ -123,7 +124,7 @@ export const sampleGameData: GameData = {
             "playerId": "9b33235c-4a92-4b00-bfaf-2d75b261711a",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 0,
+            "status": PlayerRoundStatus.UNSEEN,
             "point": -21
         },
         {
@@ -131,7 +132,7 @@ export const sampleGameData: GameData = {
             "playerId": "a8f73428-f6c3-4aee-9fcb-acc520f93e54",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 0,
+            "status": PlayerRoundStatus.UNSEEN,
             "point": -21
         },
         {
@@ -139,7 +140,7 @@ export const sampleGameData: GameData = {
             "playerId": "f4ed920e-0e85-4405-a881-571e62bf79ed",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 3,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": 50
         },
         {
@@ -147,7 +148,7 @@ export const sampleGameData: GameData = {
             "playerId": "f7bdab0a-88fe-4f93-bca5-a33a616b038d",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 0,
+            "status": PlayerRoundStatus.UNSEEN,
             "point": -21
         },
         {
@@ -155,7 +156,7 @@ export const sampleGameData: GameData = {
             "playerId": "020ced81-7d09-4d9a-9980-946e61154a72",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 0,
+            "status": PlayerRoundStatus.UNSEEN,
             "point": -25
         },
         {
@@ -163,7 +164,7 @@ export const sampleGameData: GameData = {
             "playerId": "265e83ca-3e82-49ac-912c-42cd6de16ce2",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 3,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": 0
         },
         {
@@ -171,7 +172,7 @@ export const sampleGameData: GameData = {
             "playerId": "9b33235c-4a92-4b00-bfaf-2d75b261711a",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 1,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": -12
         },
         {
@@ -179,7 +180,7 @@ export const sampleGameData: GameData = {
             "playerId": "a8f73428-f6c3-4aee-9fcb-acc520f93e54",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 1,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": -12
         },
         {
@@ -187,7 +188,7 @@ export const sampleGameData: GameData = {
             "playerId": "eea9acc6-8bce-4635-9467-a4bb5b37db07",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 5,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": 74
         },
         {
@@ -195,7 +196,7 @@ export const sampleGameData: GameData = {
             "playerId": "f4ed920e-0e85-4405-a881-571e62bf79ed",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 0,
+            "status": PlayerRoundStatus.UNSEEN,
             "point": -25
         },
         {
@@ -203,7 +204,7 @@ export const sampleGameData: GameData = {
             "playerId": "f7bdab0a-88fe-4f93-bca5-a33a616b038d",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 3,
+            "status": PlayerRoundStatus.PAUSE,
             "point": 0
         },
         {
@@ -211,7 +212,7 @@ export const sampleGameData: GameData = {
             "playerId": "020ced81-7d09-4d9a-9980-946e61154a72",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 10,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": 34
         },
         {
@@ -219,7 +220,7 @@ export const sampleGameData: GameData = {
             "playerId": "265e83ca-3e82-49ac-912c-42cd6de16ce2",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 1,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": -20
         },
         {
@@ -227,7 +228,7 @@ export const sampleGameData: GameData = {
             "playerId": "9b33235c-4a92-4b00-bfaf-2d75b261711a",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 3,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": -8
         },
         {
@@ -235,7 +236,7 @@ export const sampleGameData: GameData = {
             "playerId": "a8f73428-f6c3-4aee-9fcb-acc520f93e54",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 2,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": -14
         },
         {
@@ -243,7 +244,7 @@ export const sampleGameData: GameData = {
             "playerId": "f4ed920e-0e85-4405-a881-571e62bf79ed",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 3,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": -8
         },
         {
@@ -251,7 +252,7 @@ export const sampleGameData: GameData = {
             "playerId": "f7bdab0a-88fe-4f93-bca5-a33a616b038d",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 4,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": 16
         },
         {
@@ -259,7 +260,7 @@ export const sampleGameData: GameData = {
             "playerId": "020ced81-7d09-4d9a-9980-946e61154a72",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 3,
+            "status": PlayerRoundStatus.PAUSE,
             "point": 0
         },
         {
@@ -267,7 +268,7 @@ export const sampleGameData: GameData = {
             "playerId": "265e83ca-3e82-49ac-912c-42cd6de16ce2",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 3,
+            "status": PlayerRoundStatus.PAUSE,
             "point": 0
         },
         {
@@ -275,7 +276,7 @@ export const sampleGameData: GameData = {
             "playerId": "9b33235c-4a92-4b00-bfaf-2d75b261711a",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 0,
+            "status": PlayerRoundStatus.UNSEEN,
             "point": -15
         },
         {
@@ -283,7 +284,7 @@ export const sampleGameData: GameData = {
             "playerId": "a8f73428-f6c3-4aee-9fcb-acc520f93e54",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 2,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": -2
         },
         {
@@ -291,7 +292,7 @@ export const sampleGameData: GameData = {
             "playerId": "eea9acc6-8bce-4635-9467-a4bb5b37db07",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 3,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": 17
         },
         {
@@ -299,7 +300,7 @@ export const sampleGameData: GameData = {
             "playerId": "f4ed920e-0e85-4405-a881-571e62bf79ed",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 3,
+            "status": PlayerRoundStatus.PAUSE,
             "point": 0
         },
         {
@@ -307,7 +308,7 @@ export const sampleGameData: GameData = {
             "playerId": "f7bdab0a-88fe-4f93-bca5-a33a616b038d",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 3,
+            "status": PlayerRoundStatus.PAUSE,
             "point": 0
         },
         {
@@ -315,7 +316,7 @@ export const sampleGameData: GameData = {
             "playerId": "020ced81-7d09-4d9a-9980-946e61154a72",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 3,
+            "status": PlayerRoundStatus.PAUSE,
             "point": 0
         },
         {
@@ -323,7 +324,7 @@ export const sampleGameData: GameData = {
             "playerId": "265e83ca-3e82-49ac-912c-42cd6de16ce2",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 3,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": -8
         },
         {
@@ -331,7 +332,7 @@ export const sampleGameData: GameData = {
             "playerId": "9b33235c-4a92-4b00-bfaf-2d75b261711a",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 5,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": 2
         },
         {
@@ -339,7 +340,7 @@ export const sampleGameData: GameData = {
             "playerId": "a8f73428-f6c3-4aee-9fcb-acc520f93e54",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 4,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": -3
         },
         {
@@ -347,7 +348,7 @@ export const sampleGameData: GameData = {
             "playerId": "f4ed920e-0e85-4405-a881-571e62bf79ed",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 1,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": 22
         },
         {
@@ -355,7 +356,7 @@ export const sampleGameData: GameData = {
             "playerId": "f7bdab0a-88fe-4f93-bca5-a33a616b038d",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 2,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": -13
         },
         {
@@ -363,7 +364,7 @@ export const sampleGameData: GameData = {
             "playerId": "020ced81-7d09-4d9a-9980-946e61154a72",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 2,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": 2
         },
         {
@@ -371,7 +372,7 @@ export const sampleGameData: GameData = {
             "playerId": "265e83ca-3e82-49ac-912c-42cd6de16ce2",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 3,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": 37
         },
         {
@@ -379,7 +380,7 @@ export const sampleGameData: GameData = {
             "playerId": "9b33235c-4a92-4b00-bfaf-2d75b261711a",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 0,
+            "status": PlayerRoundStatus.UNSEEN,
             "point": -17
         },
         {
@@ -387,7 +388,7 @@ export const sampleGameData: GameData = {
             "playerId": "a8f73428-f6c3-4aee-9fcb-acc520f93e54",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 2,
-            "status": 1,
+            "status": PlayerRoundStatus.SEEN,
             "point": 2
         },
         {
@@ -395,7 +396,7 @@ export const sampleGameData: GameData = {
             "playerId": "f4ed920e-0e85-4405-a881-571e62bf79ed",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 2,
+            "status": PlayerRoundStatus.FOUL,
             "point": -7
         },
         {
@@ -403,7 +404,7 @@ export const sampleGameData: GameData = {
             "playerId": "f7bdab0a-88fe-4f93-bca5-a33a616b038d",
             "gameId": "a18448d1-96f0-4b96-9e1c-23d1872ac199",
             "maal": 0,
-            "status": 0,
+            "status": PlayerRoundStatus.UNSEEN,
             "point": -17
         }
     ]
