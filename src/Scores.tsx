@@ -10,16 +10,13 @@ import ListItemText from "@mui/material/ListItemText";
 import Switch from '@mui/material/Switch';
 import {calculatePoints, PlayerStatus} from "./calculatePoints";
 import {useRouter} from "next/router";
-import {usePlayers} from "./usePlayers";
-import {useSettings} from "./useSettings";
-import {useRounds} from "./useRounds";
 import {findIndex, head, sumBy} from "lodash";
 import {Loading} from "./Loading";
 import {LoadingButton} from "@mui/lab";
 import {Calculate, PersonAdd} from "@mui/icons-material";
-import {useRoundScores} from "./useScores";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
+import {usePlayers, useRounds, useRoundScores, useSettings} from "./useDb";
 
 export enum PlayerRoundStatus {
     UNSEEN = "Unseen",

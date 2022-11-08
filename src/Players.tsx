@@ -12,7 +12,7 @@ import ListSubheader from "@mui/material/ListSubheader";
 import {db, generateId} from "./db";
 import {LoadingButton} from "@mui/lab";
 import {isEmpty, uniqBy} from "lodash";
-import {usePlayers} from "./usePlayers";
+import {usePlayers} from "./useDb";
 
 type Player = {
     name?: String;

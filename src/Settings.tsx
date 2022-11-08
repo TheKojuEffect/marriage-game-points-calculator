@@ -11,7 +11,7 @@ import {db, DbSettings} from "./db";
 import {GameIdProp} from "./GameIdProp";
 import {LoadingButton} from "@mui/lab";
 import {Save} from "@mui/icons-material";
-import {useSettings} from "./useSettings";
+import {useSettings} from "./useDb";
 
 export interface GameSettings {
     pointRate: number;

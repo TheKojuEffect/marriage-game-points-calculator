@@ -1,8 +1,5 @@
 import {FC, useState} from "react";
 import {GameIdProp} from "./GameIdProp";
-import {usePlayers} from "./usePlayers";
-import {useScores} from "./useScores";
-import {useRounds} from "./useRounds";
 import {Loading} from "./Loading";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -16,13 +13,12 @@ import Box from "@mui/material/Box";
 import {Button, InputAdornment, Stack, TextField} from "@mui/material";
 import {mergeWith} from "lodash";
 import Link from "next/link";
-import {useSettings} from "./useSettings";
-import {useGame} from "./useGame";
 import {encodeGameData} from "./codec";
 import {useRouter} from "next/router";
 import {GameData} from "./Share";
 import IconButton from "@mui/material/IconButton";
 import {ContentCopy, ContentCopyTwoTone, Settings, Share, Start} from "@mui/icons-material";
+import {useGame, usePlayers, useRounds, useScores, useSettings} from "./useDb";
 
 type PlayerPoints = Record<string, number>;
 type RoundPlayerPoints = Record<string, PlayerPoints>;

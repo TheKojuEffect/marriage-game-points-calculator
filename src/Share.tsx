@@ -4,7 +4,7 @@ import {db, DbGame, DbPlayer, DbRound, DbScore, DbSettings} from "./db";
 import {useRouter} from "next/router";
 import {Loading} from "./Loading";
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle} from "@mui/material";
-import {getGameById} from "./useGame";
+import {getGameById} from "./useDb";
 
 export interface GameData {
     game: DbGame,
