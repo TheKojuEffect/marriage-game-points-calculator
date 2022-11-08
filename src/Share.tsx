@@ -1,5 +1,5 @@
 import {FC, useEffect, useRef, useState} from "react";
-import {decode} from "./codec";
+import {decodeGameData} from "./codec";
 import {db, DbGame, DbPlayer, DbRound, DbScore, DbSettings} from "./db";
 import {useRouter} from "next/router";
 import {Loading} from "./Loading";
@@ -76,7 +76,7 @@ export const Share: FC<{ game: string }> = ({game}) => {
 
     useEffect(() => {
         try {
-            const data = decode(game);
+            const data = decodeGameData(game);
             const valid = isGameData(data);
             setValidData(valid);
             if (valid) {

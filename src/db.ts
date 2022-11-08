@@ -23,7 +23,6 @@ export interface DbRound {
     id: string,
     createdAt: Date,
     gameId: string,
-    index: number;
     winnerPlayerId: string,
     dubleeWin: boolean
 }

@@ -1,15 +1,19 @@
-import {sampleGameData} from "./sampleGameData";
-import {decode, encode} from "../src/codec";
+import {sampleGameData, sampleWithOnlyPlayers} from "./sampleGameData";
+import {decodeGameData, encodeGameData} from "../src/codec";
 
-test('encode and decode should give same result', () => {
-    const encoded = encode(sampleGameData);
-    const decoded = decode(encoded);
+const samples = [sampleGameData, sampleWithOnlyPlayers];
 
-    const fullDataLength = JSON.stringify(sampleGameData).length;
-    const encodedLength = encoded.length;
-    const compression = encodedLength / fullDataLength * 100;
-    console.log({fullDataLength, encodedLength, compression})
+describe('Game Data codec', () => {
+    samples.forEach((sample, index) => {
+        test(`encode and decode should give same result for ${index}`, () => {
+            const encoded = encodeGameData(sample);
+            const decoded = decodeGameData(encoded);
 
-    expect(decoded)
-        .toEqual(expect.objectContaining(sampleGameData))
+            expect(decoded.game).toEqual(expect.objectContaining(sample.game));
+            expect(decoded.settings).toEqual(expect.objectContaining(sample.settings));
+            expect(decoded.players).toEqual(expect.arrayContaining(sample.players));
+            expect(decoded.rounds).toEqual(expect.arrayContaining(sample.rounds));
+            expect(decoded.scores).toEqual(expect.arrayContaining(sample.scores));
+        });
+    })
 });

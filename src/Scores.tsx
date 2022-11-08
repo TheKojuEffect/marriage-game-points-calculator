@@ -22,10 +22,10 @@ import Typography from "@mui/material/Typography";
 import Link from "next/link";
 
 export enum PlayerRoundStatus {
-    UNSEEN = "Unseen",
-    SEEN = "Seen",
-    FOUL = "Foul",
-    PAUSE = "Pause",
+    UNSEEN,
+    SEEN,
+    FOUL,
+    PAUSE,
 }
 
 type RoundScore = {
@@ -127,7 +127,6 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
             id: roundId,
             createdAt: new Date(),
             gameId,
-            index: 0,
             winnerPlayerId: round.winnerPlayerId,
             dubleeWin: round.dubleeWin,
         }

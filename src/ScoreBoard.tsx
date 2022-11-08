@@ -18,7 +18,7 @@ import {mergeWith} from "lodash";
 import Link from "next/link";
 import {useSettings} from "./useSettings";
 import {useGame} from "./useGame";
-import {encode} from "./codec";
+import {encodeGameData} from "./codec";
 import {useRouter} from "next/router";
 import {GameData} from "./Share";
 import IconButton from "@mui/material/IconButton";
@@ -64,7 +64,9 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
 
     const shareGame = async () => {
         const gameData: GameData = {game, settings, players, rounds, scores};
-        const param = encode(gameData);
+        console.log(gameData)
+
+        const param = encodeGameData(gameData);
         const url = `${window.location.origin}/share?game=${param}`;
         if (navigator.share) {
             await navigator.share({
