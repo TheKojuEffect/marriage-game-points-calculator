@@ -42,7 +42,7 @@ export const Settings: FC<GameIdProp> = ({gameId}) => {
         if (existingSettings) {
             reset(existingSettings);
         }
-    }, [existingSettings])
+    }, [existingSettings, reset])
 
     const onSubmit = async (settings: DbSettings) => {
         setSaving(true)

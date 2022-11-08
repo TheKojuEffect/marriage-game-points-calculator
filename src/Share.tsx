@@ -1,4 +1,4 @@
-import {FC, useEffect, useRef, useState} from "react";
+import {FC, useCallback, useEffect, useRef, useState} from "react";
 import {decodeGameData} from "./codec";
 import {db, DbGame, DbPlayer, DbRound, DbScore, DbSettings} from "./db";
 import {useRouter} from "next/router";
@@ -32,7 +32,7 @@ export const Share: FC<{ game: string }> = ({game}) => {
     const [gameData, setGameData] = useState<GameData | undefined>(undefined);
 
     const gotoHome = () => router.push("/");
-    const gotoScoreboard = (gameId: string) => router.push(`/scoreboard?gameId=${gameId}`);
+    const gotoScoreboard = useCallback((gameId: string) => router.push(`/scoreboard?gameId=${gameId}`), [router]);
 
     const saveGameData = async ({
         game,
@@ -66,15 +66,14 @@ export const Share: FC<{ game: string }> = ({game}) => {
         await gotoScoreboard(gameData!.game.id);
     }
 
-    const continueGame = async (gameData: GameData) => {
-        if (!dbPopulated.current) {
-            dbPopulated.current = true;
-            await saveGameData(gameData!);
-            await gotoScoreboard(gameData!.game.id);
-        }
-    }
-
     useEffect(() => {
+        const continueGame = async (gameData: GameData) => {
+            if (!dbPopulated.current) {
+                dbPopulated.current = true;
+                await saveGameData(gameData!);
+                await gotoScoreboard(gameData!.game.id);
+            }
+        }
         try {
             const data = decodeGameData(game);
             const valid = isGameData(data);
@@ -96,7 +95,7 @@ export const Share: FC<{ game: string }> = ({game}) => {
         } finally {
             setProcessed(true);
         }
-    }, []);
+    }, [game, gotoScoreboard]);
 
     if (!processed) {
         return <Loading/>

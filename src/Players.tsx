@@ -47,7 +47,7 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
         if (!isEmpty(existingPlayers)) {
             reset({players: existingPlayers})
         }
-    }, [existingPlayers]);
+    }, [existingPlayers, reset]);
 
     const handleErrorClose = () => {
         setShowError(false)

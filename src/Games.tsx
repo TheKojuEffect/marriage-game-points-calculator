@@ -31,7 +31,7 @@ export const Games: FC = () => {
         const gameIdsToDelete = gamesWithoutPlayers.map(g => g.id);
         db.settings.bulkDelete(gameIdsToDelete);
         db.games.bulkDelete(gameIdsToDelete);
-    }, [games])
+    }, [gamesWithoutPlayers])
 
     if (!games || !players || !settings) {
         return <Loading/>;

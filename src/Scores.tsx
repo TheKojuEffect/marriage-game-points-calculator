@@ -1,4 +1,4 @@
-import {FC, useEffect, useState} from "react";
+import {FC, useCallback, useEffect, useState} from "react";
 import {GameIdProp} from "./GameIdProp";
 import {db, DbRound, DbScore, generateId} from "./db";
 import Box from "@mui/material/Box";
@@ -63,7 +63,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
     const prevRoundPlayerStatus: PlayerStatus =
         Object.fromEntries(prevRoundScores?.map(s => [s.playerId, s.status]) ?? []);
 
-    const getDefaultScores = (): RoundScore[] => {
+    const getDefaultScores = useCallback((): RoundScore[] => {
         if (round && roundScores) {
             return roundScores.map(score => ({playerId: score.playerId, maal: score.maal, status: score.status}))
                 .sort((s1, s2) => playerIndex[s1.playerId] - playerIndex[s2.playerId]);
@@ -76,12 +76,13 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                 status: pause ? PlayerRoundStatus.PAUSE : PlayerRoundStatus.UNSEEN
             };
         }) ?? [];
-    }
-    const getDefaultValues = (): Round => ({
+    }, [round, roundScores, players, playerIndex, prevRoundPlayerStatus]);
+
+    const getDefaultValues = useCallback((): Round => ({
         winnerPlayerId: round?.winnerPlayerId || "",
         dubleeWin: round?.dubleeWin || false,
         scores: getDefaultScores(),
-    });
+    }), [round, getDefaultScores]);
 
     const {handleSubmit, register, control, reset, setValue, getValues, formState: {errors}} =
         useForm<Round>({
@@ -90,7 +91,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
 
     const {fields, update} = useFieldArray<Round>({control, name: "scores"});
 
-    const updateDubleeWinStatus = () => {
+    const updateDubleeWinStatus = useCallback(() => {
         const playerStatuses = getValues("scores").map(s => s.status);
         const noOfActivePlayers = sumBy(playerStatuses, status => status !== PlayerRoundStatus.PAUSE ? 1 : 0);
         const disableDublee = noOfActivePlayers < 4;
@@ -98,15 +99,15 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
         if (disableDublee) {
             setValue("dubleeWin", false);
         }
-    }
+    }, [getValues, setValue, setDisableDubleeWin]);
 
     useEffect(() => {
         reset(getDefaultValues());
-    }, [players, round, roundScores, prevRoundScores])
+    }, [players, round, roundScores, prevRoundScores, getDefaultValues, reset])
 
     useEffect(() => {
         updateDubleeWinStatus();
-    }, [fields])
+    }, [fields, updateDubleeWinStatus])
 
     if (!players || !settings || !rounds) {
         return <Loading/>;
