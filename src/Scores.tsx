@@ -57,17 +57,18 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
     const [disableDubleeWin, setDisableDubleeWin] = useState(true);
     const readOnly = !!round;
 
-    const playerIndex: Record<string, number> =
-        Object.fromEntries(players?.map(p => [p.id, p.index]) ?? []);
-
-    const prevRoundPlayerStatus: PlayerStatus =
-        Object.fromEntries(prevRoundScores?.map(s => [s.playerId, s.status]) ?? []);
-
     const getDefaultScores = useCallback((): RoundScore[] => {
+        const playerIndex: Record<string, number> =
+            Object.fromEntries(players?.map(p => [p.id, p.index]) ?? []);
+
+        const prevRoundPlayerStatus: PlayerStatus =
+            Object.fromEntries(prevRoundScores?.map(s => [s.playerId, s.status]) ?? []);
+
         if (round && roundScores) {
             return roundScores.map(score => ({playerId: score.playerId, maal: score.maal, status: score.status}))
                 .sort((s1, s2) => playerIndex[s1.playerId] - playerIndex[s2.playerId]);
         }
+
         return players?.map(player => {
             const pause = prevRoundPlayerStatus[player.id] === PlayerRoundStatus.PAUSE;
             return {
@@ -76,7 +77,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                 status: pause ? PlayerRoundStatus.PAUSE : PlayerRoundStatus.UNSEEN
             };
         }) ?? [];
-    }, [round, roundScores, players, playerIndex, prevRoundPlayerStatus]);
+    }, [round, roundScores, players]);
 
     const getDefaultValues = useCallback((): Round => ({
         winnerPlayerId: round?.winnerPlayerId || "",
@@ -103,7 +104,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
 
     useEffect(() => {
         reset(getDefaultValues());
-    }, [players, round, roundScores, prevRoundScores, getDefaultValues, reset])
+    }, [getDefaultValues, reset])
 
     useEffect(() => {
         updateDubleeWinStatus();
