@@ -11,6 +11,6 @@ export const About: FC = () =>
             Bug Reports and Feature Requests
         </Link>
         <Link href="https://koju.dev/">
-            Developed by koju.dev
+            Developed by Kapil Koju
         </Link>
     </Stack>

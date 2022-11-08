@@ -18,7 +18,9 @@ export const Home: FC = () => {
     return (
         <Stack spacing={3}>
             <Button variant="contained" onClick={newGame}>New Game</Button>
-            <Button variant="contained">Previous Games</Button>
+            <Link href="/games" legacyBehavior>
+                <Button variant="contained">Previous Games</Button>
+            </Link>
             <Link href="/instructions" legacyBehavior>
                 <Button variant="contained">Instructions</Button>
             </Link>
