@@ -8,6 +8,7 @@ import {Loading} from "./Loading";
 import Link from "next/link";
 import {groupBy, isEmpty, partition} from "lodash";
 import {NewGame} from "./NewGame";
+import ListSubheader from "@mui/material/ListSubheader";
 
 export const Games: FC = () => {
     const games =
@@ -39,7 +40,11 @@ export const Games: FC = () => {
     return (
         <Stack direction="column" spacing={2}>
             <NewGame/>
-            <List>
+            <List
+                subheader={<ListSubheader color="primary">
+                    {gamesWithPlayers.length === 0 && "No"} Previous Games
+                </ListSubheader>}
+            >
                 {gamesWithPlayers.map(game =>
                     <ListItem key={game.id} disablePadding>
                         <Link href={`/scoreboard/?gameId=${game.id}`} legacyBehavior>
