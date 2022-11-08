@@ -85,7 +85,6 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
             <TableContainer component={Paper}>
                 <Table
                     sx={{tableLayout: "fixed"}}
-                    size="small"
                 >
                     <TableHead>
                         <TableRow>
