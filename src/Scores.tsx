@@ -1,8 +1,8 @@
 import {FC, useEffect, useState} from "react";
 import {GameIdProp} from "./GameIdProp";
-import {db, DbPlayer, DbRound, DbScore, generateId} from "./db";
+import {db, DbRound, DbScore, generateId} from "./db";
 import Box from "@mui/material/Box";
-import {FormControl, FormControlLabel, ListItem, MenuItem, Select, Stack, TextField} from "@mui/material";
+import {FormControl, FormControlLabel, ListItem, MenuItem, Select, Stack, TextField, Tooltip} from "@mui/material";
 import ListSubheader from "@mui/material/ListSubheader";
 import {Controller, useFieldArray, useForm} from "react-hook-form";
 import List from "@mui/material/List";
@@ -13,11 +13,12 @@ import {useRouter} from "next/router";
 import {usePlayers} from "./usePlayers";
 import {useSettings} from "./useSettings";
 import {useRounds} from "./useRounds";
-import {head} from "lodash";
+import {head, sumBy} from "lodash";
 import {Loading} from "./Loading";
 import {LoadingButton} from "@mui/lab";
 import {Calculate} from "@mui/icons-material";
 import {useRoundScores} from "./useScores";
+import Typography from "@mui/material/Typography";
 
 export enum PlayerRoundStatus {
     UNSEEN = "Unseen",
@@ -52,6 +53,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
     const prevRound = round ? rounds?.find(r => r.createdAt < round.createdAt) : head(rounds);
     const prevRoundScores = useRoundScores(prevRound?.id);
     const [saving, setSaving] = useState(false);
+    const [disableDubleeWin, setDisableDubleeWin] = useState(true);
     const readOnly = !!round;
 
     const playerIndex: Record<string, number> =
@@ -67,11 +69,11 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
         }
         return players?.map(player => {
             const pause = prevRoundPlayerStatus[player.id] === PlayerRoundStatus.PAUSE;
-            return ({
+            return {
                 playerId: player.id,
                 maal: pause ? 0 : undefined,
                 status: pause ? PlayerRoundStatus.PAUSE : PlayerRoundStatus.UNSEEN
-            });
+            };
         }) ?? [];
     }
     const getDefaultValues = (): Round => ({
@@ -90,6 +92,15 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
     useEffect(() => {
         reset(getDefaultValues());
     }, [players, round, roundScores, prevRoundScores])
+
+    useEffect(() => {
+        const noOfActivePlayers = sumBy(fields, f => f.status !== PlayerRoundStatus.PAUSE ? 1 : 0);
+        const disableDublee = noOfActivePlayers < 4;
+        setDisableDubleeWin(disableDublee);
+        if (disableDublee) {
+            setValue("dubleeWin", false);
+        }
+    }, [fields])
 
     if (!players || !settings || !rounds) {
         return <Loading/>;
@@ -203,9 +214,22 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                             control={control}
                             render={({field}) =>
                                 <FormControlLabel
-                                    control={<Switch {...field} />}
+                                    control={
+                                        <Switch
+                                            checked={field.value}
+                                            onChange={field.onChange}
+                                        />
+                                    }
+                                    disabled={disableDubleeWin}
                                     labelPlacement="start"
-                                    label="Dublee Win"/>
+                                    label={
+                                        <Tooltip title="Applicable for 4 or more players" arrow>
+                                            <Typography>
+                                                Dublee Win
+                                            </Typography>
+                                        </Tooltip>
+                                    }
+                                />
                             }/>
                     </FormControl>
                 </ListItem>
