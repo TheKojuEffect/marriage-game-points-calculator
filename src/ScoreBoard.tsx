@@ -55,6 +55,8 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                 return objValue + srcValue;
             });
 
+    const getTotalPoints = (player: DbPlayer) => totalPlayerPoints[player.id] ?? 0;
+
     const amountFormat = new Intl.NumberFormat();
 
     const shareGame = async () => {
@@ -92,7 +94,7 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                             </TableCell>
                             {
                                 players.map(player =>
-                                    <TableCell key={player.id} align="center">{totalPlayerPoints[player.id]}</TableCell>
+                                    <TableCell key={player.id} align="center">{getTotalPoints(player)}</TableCell>
                                 )
                             }
                         </TableRow>
@@ -103,7 +105,7 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                             {
                                 players.map(player =>
                                     <TableCell key={player.id} align="center">
-                                        {amountFormat.format(totalPlayerPoints[player.id] * settings.pointRate)}
+                                        {amountFormat.format(getTotalPoints(player) * settings.pointRate)}
                                     </TableCell>
                                 )
                             }
