@@ -2,7 +2,7 @@ import {FC, useEffect, useState} from "react";
 import {GameIdProp} from "./GameIdProp";
 import {db, DbRound, DbScore, generateId} from "./db";
 import Box from "@mui/material/Box";
-import {FormControl, FormControlLabel, ListItem, MenuItem, Select, Stack, TextField, Tooltip} from "@mui/material";
+import {Button, FormControl, FormControlLabel, ListItem, MenuItem, Select, Stack, TextField, Tooltip} from "@mui/material";
 import ListSubheader from "@mui/material/ListSubheader";
 import {Controller, useFieldArray, useForm} from "react-hook-form";
 import List from "@mui/material/List";
@@ -16,9 +16,10 @@ import {useRounds} from "./useRounds";
 import {head, sumBy} from "lodash";
 import {Loading} from "./Loading";
 import {LoadingButton} from "@mui/lab";
-import {Calculate} from "@mui/icons-material";
+import {Calculate, PersonAdd} from "@mui/icons-material";
 import {useRoundScores} from "./useScores";
 import Typography from "@mui/material/Typography";
+import Link from "next/link";
 
 export enum PlayerRoundStatus {
     UNSEEN = "Unseen",
@@ -208,6 +209,18 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                     </FormControl>
                 </ListItem>
                 <ListItem>
+                    <Link href={`/players?gameId=${gameId}`} legacyBehavior>
+                        <Button
+                            type="button"
+                            variant="outlined"
+                            color="primary"
+                            size="small"
+                            startIcon={<PersonAdd/>}
+                            sx={{width: 200}}
+                        >
+                            Add Players
+                        </Button>
+                    </Link>
                     <FormControl size="small" sx={{width: 0.8}}>
                         <Controller
                             name="dubleeWin"
