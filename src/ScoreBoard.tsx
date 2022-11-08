@@ -13,7 +13,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {DbPlayer, DbRound} from "./db";
 import Box from "@mui/material/Box";
-import {Button, Stack, TextField, Tooltip} from "@mui/material";
+import {Button, Stack, TextField} from "@mui/material";
 import {mergeWith} from "lodash";
 import Link from "next/link";
 import {useSettings} from "./useSettings";
@@ -145,11 +145,9 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                             rounds.map((round, index) =>
                                 <TableRow key={round.id}>
                                     <TableCell align="center">
-                                        <Tooltip title={round.createdAt.toLocaleString()} arrow>
-                                            <span>
-                                                {rounds.length - index}
-                                            </span>
-                                        </Tooltip>
+                                        <Link href={`/scores?gameId=${gameId}&roundId=${round.id}`}>
+                                            #{rounds.length - index}
+                                        </Link>
                                     </TableCell>
                                     {
                                         players.map(player =>

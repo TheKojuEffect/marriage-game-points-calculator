@@ -13,7 +13,7 @@ import {useRouter} from "next/router";
 import {usePlayers} from "./usePlayers";
 import {useSettings} from "./useSettings";
 import {useRounds} from "./useRounds";
-import {head, sumBy} from "lodash";
+import {findIndex, head, sumBy} from "lodash";
 import {Loading} from "./Loading";
 import {LoadingButton} from "@mui/lab";
 import {Calculate, PersonAdd} from "@mui/icons-material";
@@ -41,7 +41,7 @@ export interface Round {
 }
 
 type ScoresProps = GameIdProp & {
-    roundId?: string
+    roundId: string | undefined
 };
 
 export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
@@ -90,17 +90,22 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
 
     const {fields, update} = useFieldArray<Round>({control, name: "scores"});
 
-    useEffect(() => {
-        reset(getDefaultValues());
-    }, [players, round, roundScores, prevRoundScores])
-
-    useEffect(() => {
-        const noOfActivePlayers = sumBy(fields, f => f.status !== PlayerRoundStatus.PAUSE ? 1 : 0);
+    const updateDubleeWinStatus = () => {
+        const playerStatuses = getValues("scores").map(s => s.status);
+        const noOfActivePlayers = sumBy(playerStatuses, status => status !== PlayerRoundStatus.PAUSE ? 1 : 0);
         const disableDublee = noOfActivePlayers < 4;
         setDisableDubleeWin(disableDublee);
         if (disableDublee) {
             setValue("dubleeWin", false);
         }
+    }
+
+    useEffect(() => {
+        reset(getDefaultValues());
+    }, [players, round, roundScores, prevRoundScores])
+
+    useEffect(() => {
+        updateDubleeWinStatus();
     }, [fields])
 
     if (!players || !settings || !rounds) {
@@ -149,6 +154,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
 
     const changeStatusToSeen = (index: number) => {
         setValue(`scores.${index}.status`, PlayerRoundStatus.SEEN);
+        updateDubleeWinStatus()
     }
     const onSelectWinner = (playerId: string) => {
         if (playerId) {
@@ -170,10 +176,18 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
         }
     }
 
+    const roundNum = round ?
+        rounds.length - findIndex(rounds, r => r.id === round.id)
+        : rounds.length + 1
+
+    const roundDateTime = round ? `played on ${round.createdAt.toLocaleString()}`: ''
+
     return (
         <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
             <List
-                subheader={<ListSubheader color="primary">Round #{rounds.length + 1}</ListSubheader>}
+                subheader={<ListSubheader color="primary">
+                    Round #{roundNum} {roundDateTime}
+                </ListSubheader>}
             >
                 <ListItem>
                     <ListItemText primary="Winner"/>
@@ -185,6 +199,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                                 <Select
                                     {...field}
                                     displayEmpty
+                                    readOnly={readOnly}
                                     {...register("winnerPlayerId", {required: true})}
                                     onChange={(event) => {
                                         field.onChange(event);
@@ -229,6 +244,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                                 <FormControlLabel
                                     control={
                                         <Switch
+                                            readOnly={readOnly}
                                             checked={field.value}
                                             onChange={field.onChange}
                                         />
@@ -264,11 +280,13 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                                         <TextField
                                             inputProps={{style: {textAlign: "center"}}}
                                             sx={{width: '9ch', textAlign: 'center'}}
-                                            variant="outlined"
                                             label="Maal"
                                             type="number"
                                             size="small"
                                             required
+                                            InputProps={{
+                                                readOnly,
+                                            }}
                                             {...register(`scores.${index}.maal` as const, {min: 0, valueAsNumber: true, required: true})}
                                             onChange={(event) => {
                                                 field.onChange(event);
@@ -294,6 +312,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                                                     const status = event.target.value;
                                                     onStatusChange(index, status as PlayerRoundStatus);
                                                 }}
+                                                readOnly={readOnly}
                                                 error={!!(errors?.scores && errors.scores[index]?.status)}
                                             >
                                                 {
@@ -317,17 +336,30 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
             </List>
 
             <Stack direction="row" spacing={2}>
-                <LoadingButton
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    loading={saving}
-                    loadingPosition="start"
-                    startIcon={<Calculate/>}
-                >
-                    Calculate
-                </LoadingButton>
+                {readOnly
+                    ?
+                    <Button
+                        type="button"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        onClick={router.back}
+                    >
+                        Back
+                    </Button>
+                    :
+                    <LoadingButton
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        loading={saving}
+                        loadingPosition="start"
+                        startIcon={<Calculate/>}
+                    >
+                        Calculate
+                    </LoadingButton>
+                }
             </Stack>
         </Box>
     );
