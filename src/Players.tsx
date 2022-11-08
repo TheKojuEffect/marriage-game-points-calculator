@@ -80,8 +80,8 @@ export const Players: FC<{ gameId: string }> = ({gameId}) => {
 
         setSaving(true);
         await db.players.bulkAdd(addedPlayers);
-        setSaving(false);
         await router.push(`/scores?gameId=${gameId}`);
+        setSaving(false);
     }
 
     return (

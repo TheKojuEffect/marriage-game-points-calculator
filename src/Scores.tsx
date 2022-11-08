@@ -147,8 +147,8 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
             await db.rounds.add(dbRound);
             await db.scores.bulkAdd(dbScores);
         });
-        setSaving(false);
         await router.push(`/scoreboard?gameId=${gameId}`);
+        setSaving(false);
     };
 
     const changeStatusToSeen = (index: number) => {

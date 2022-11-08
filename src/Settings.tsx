@@ -51,8 +51,8 @@ export const Settings: FC<GameIdProp> = ({gameId}) => {
                 ...settings
             });
         }
-        setSaving(false);
         await router.push(`/players?gameId=${gameId}`);
+        setSaving(false);
     };
 
     return (
