@@ -22,7 +22,7 @@ import {encode} from "./codec";
 import {useRouter} from "next/router";
 import {GameData} from "./Share";
 import IconButton from "@mui/material/IconButton";
-import {ContentCopy, ContentCopyTwoTone, Share, Start} from "@mui/icons-material";
+import {ContentCopy, ContentCopyTwoTone, Settings, Share, Start} from "@mui/icons-material";
 
 type PlayerPoints = Record<string, number>;
 type RoundPlayerPoints = Record<string, PlayerPoints>;
@@ -123,15 +123,29 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                 </Table>
             </TableContainer>
             <Stack spacing={3} sx={{my: 3}}>
-                <Link href={`/scores?gameId=${gameId}`} legacyBehavior>
-                    <Button
-                        variant="contained"
-                        endIcon={<Start/>}
-                    >
-                        New Round
-                    </Button>
-                </Link>
+                <Stack direction="row" spacing={2}>
+                    <Link href={`/settings?gameId=${gameId}`} legacyBehavior>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            color="info"
+                            startIcon={<Settings/>}
+                        >
+                            Settings
+                        </Button>
+                    </Link>
+                    <Link href={`/scores?gameId=${gameId}`} legacyBehavior>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            endIcon={<Start/>}
+                        >
+                            New Round
+                        </Button>
+                    </Link>
+                </Stack>
                 <Button
+                    fullWidth
                     variant="contained"
                     onClick={shareGame}
                     endIcon={<Share/>}
