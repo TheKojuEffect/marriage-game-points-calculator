@@ -1,5 +1,5 @@
 import {FC, useEffect} from "react";
-import {ListItem, ListItemButton} from "@mui/material";
+import {ListItem, ListItemButton, Stack} from "@mui/material";
 import {useLiveQuery} from "dexie-react-hooks";
 import {db, DbGame, DbPlayer} from "./db";
 import List from "@mui/material/List";
@@ -7,6 +7,7 @@ import ListItemText from "@mui/material/ListItemText";
 import {Loading} from "./Loading";
 import Link from "next/link";
 import {groupBy, isEmpty, partition} from "lodash";
+import {NewGame} from "./NewGame";
 
 export const Games: FC = () => {
     const games =
@@ -36,20 +37,23 @@ export const Games: FC = () => {
     }
 
     return (
-        <List>
-            {gamesWithPlayers.map(game =>
-                <ListItem key={game.id} disablePadding>
-                    <Link href={`/scoreboard/?gameId=${game.id}`} legacyBehavior>
-                        <ListItemButton>
-                            <ListItemText
-                                primary={game.createdAt.toLocaleString()}
-                                secondary={getGamePlayerNames(game)}
-                            />
-                        </ListItemButton>
-                    </Link>
-                </ListItem>
-            )}
-        </List>
+        <Stack direction="column" spacing={2}>
+            <NewGame/>
+            <List>
+                {gamesWithPlayers.map(game =>
+                    <ListItem key={game.id} disablePadding>
+                        <Link href={`/scoreboard/?gameId=${game.id}`} legacyBehavior>
+                            <ListItemButton>
+                                <ListItemText
+                                    primary={game.createdAt.toLocaleString()}
+                                    secondary={getGamePlayerNames(game)}
+                                />
+                            </ListItemButton>
+                        </Link>
+                    </ListItem>
+                )}
+            </List>
+        </Stack>
     );
 
 }
