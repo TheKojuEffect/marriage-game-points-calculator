@@ -43,7 +43,7 @@ function MyApp({Component, pageProps}: AppProps) {
                 <Container maxWidth="sm" disableGutters>
                     <NavBar/>
                     <Card variant="outlined" sx={{m: 1}}>
-                        <CardContent>
+                        <CardContent sx={{p:1}}>
                             <Component {...pageProps} />
                         </CardContent>
                     </Card>

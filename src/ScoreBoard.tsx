@@ -9,7 +9,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {DbPlayer, DbRound} from "./db";
-import Box from "@mui/material/Box";
 import {Button, InputAdornment, Stack, TextField} from "@mui/material";
 import {mergeWith} from "lodash";
 import Link from "next/link";
@@ -79,38 +78,72 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
         setShareUrlCopied(true);
     }
 
+    const largeTable = players.length > 4;
+
     return (
-        <Box>
+        <>
             <TableContainer component={Paper}>
-                <Table>
+                <Table
+                    sx={{tableLayout: "fixed"}}
+                    size="small"
+                >
                     <TableHead>
                         <TableRow>
-                            <TableCell>Total</TableCell>
+                            <TableCell
+                                size="small"
+                                padding="none"
+                                align="center"
+                            >
+                                Total
+                            </TableCell>
                             {
                                 players.map(player =>
-                                    <TableCell key={player.id} align="center">{player.name}</TableCell>
+                                    <TableCell
+                                        key={player.id}
+                                        align="center"
+                                        size="small"
+                                    >
+                                        {player.name.substring(0, 4)}
+                                    </TableCell>
                                 )
                             }
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell>
-                                Points
+                            <TableCell
+                                padding="none"
+                                align="center"
+                                size="small"
+                            >
+                                {largeTable ? "Pts" : "Points"}
                             </TableCell>
                             {
                                 players.map(player =>
-                                    <TableCell key={player.id} align="center">{getTotalPoints(player)}</TableCell>
+                                    <TableCell
+                                        key={player.id}
+                                        align="center"
+                                        size="small"
+                                    >
+                                        {getTotalPoints(player)}
+                                    </TableCell>
                                 )
                             }
                         </TableRow>
                         <TableRow>
-                            <TableCell>
-                                Amount @{amountFormat.format(settings.pointRate)}/point
+                            <TableCell
+                                padding="none"
+                                align="center"
+                            >
+                                {largeTable ? "Amt" : "Amount"}
+                                @{amountFormat.format(settings.pointRate)}
                             </TableCell>
                             {
                                 players.map(player =>
-                                    <TableCell key={player.id} align="center">
+                                    <TableCell
+                                        key={player.id}
+                                        align="center"
+                                    >
                                         {amountFormat.format(getTotalPoints(player) * settings.pointRate)}
                                     </TableCell>
                                 )
@@ -176,13 +209,22 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
 
             </Stack>
             <TableContainer component={Paper}>
-                <Table>
+                <Table sx={{tableLayout: "fixed"}}>
                     <TableHead>
                         <TableRow>
-                            <TableCell align="center">Round</TableCell>
+                            <TableCell
+                                align="center"
+                            >
+                                {largeTable ? "Rnd" : "Round"}
+                            </TableCell>
                             {
                                 players.map(player =>
-                                    <TableCell key={player.id} align="center">{player.name}</TableCell>
+                                    <TableCell
+                                        key={player.id}
+                                        align="center"
+                                    >
+                                        {player.name.substring(0, 4)}
+                                    </TableCell>
                                 )
                             }
                         </TableRow>
@@ -198,7 +240,12 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                                     </TableCell>
                                     {
                                         players.map(player =>
-                                            <TableCell key={player.id} align="center">{roundPlayerPoints[round.id][player.id]}</TableCell>
+                                            <TableCell
+                                                key={player.id}
+                                                align="center"
+                                            >
+                                                {roundPlayerPoints[round.id][player.id]}
+                                            </TableCell>
                                         )
                                     }
 
@@ -208,6 +255,6 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                     </TableBody>
                 </Table>
             </TableContainer>
-        </Box>
+        </>
     );
 }
