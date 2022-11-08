@@ -180,7 +180,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
         rounds.length - findIndex(rounds, r => r.id === round.id)
         : rounds.length + 1
 
-    const roundDateTime = round ? `played on ${round.createdAt.toLocaleString()}`: ''
+    const roundDateTime = round ? `played on ${round.createdAt.toLocaleString()}` : ''
 
     return (
         <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -339,30 +339,27 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
             </List>
 
             <Stack direction="row" spacing={2}>
-                {readOnly
-                    ?
-                    <Button
-                        type="button"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        onClick={router.back}
-                    >
-                        Back
-                    </Button>
-                    :
-                    <LoadingButton
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        loading={saving}
-                        loadingPosition="start"
-                        startIcon={<Calculate/>}
-                    >
-                        Calculate
-                    </LoadingButton>
-                }
+                <Button
+                    type="button"
+                    fullWidth
+                    variant="outlined"
+                    color="primary"
+                    onClick={router.back}
+                >
+                    Back
+                </Button>
+                <LoadingButton
+                    type="submit"
+                    disabled={readOnly}
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    loading={saving}
+                    loadingPosition="start"
+                    startIcon={<Calculate/>}
+                >
+                    Calculate
+                </LoadingButton>
             </Stack>
         </Box>
     );
