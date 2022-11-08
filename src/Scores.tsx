@@ -200,6 +200,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                                     {...field}
                                     displayEmpty
                                     readOnly={readOnly}
+                                    variant={readOnly ? "filled" : "outlined"}
                                     {...register("winnerPlayerId", {required: true})}
                                     onChange={(event) => {
                                         field.onChange(event);
@@ -284,6 +285,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                                             type="number"
                                             size="small"
                                             required
+                                            variant={readOnly ? "filled" : "outlined"}
                                             InputProps={{
                                                 readOnly,
                                             }}
@@ -313,6 +315,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                                                     onStatusChange(index, status as PlayerRoundStatus);
                                                 }}
                                                 readOnly={readOnly}
+                                                variant={readOnly ? "filled" : "outlined"}
                                                 error={!!(errors?.scores && errors.scores[index]?.status)}
                                             >
                                                 {
