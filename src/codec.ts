@@ -1,8 +1,10 @@
+import {compressToEncodedURIComponent, decompressFromEncodedURIComponent} from "lz-string";
+
 export const encode = (value: any): string =>
-    encodeURIComponent(window.btoa(JSON.stringify(value)));
+    compressToEncodedURIComponent(JSON.stringify(value));
 
 export const decode = (value: string): unknown =>
-    JSON.parse(window.atob(decodeURIComponent(value)), dateReviver); // TODO: Checkout zod for parsing
+    JSON.parse(decompressFromEncodedURIComponent(value)!, dateReviver); // TODO: Checkout zod for parsing
 
 function dateReviver(_: any, value: any) {
     // If the value is a string and if it roughly looks like it could be a
