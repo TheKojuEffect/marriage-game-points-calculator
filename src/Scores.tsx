@@ -2,7 +2,7 @@ import {FC, useCallback, useEffect, useState} from "react";
 import {GameIdProp} from "./GameIdProp";
 import {db, DbRound, DbScore} from "./db";
 import Box from "@mui/material/Box";
-import {Button, FormControl, FormControlLabel, ListItem, MenuItem, Select, Stack, TextField, Tooltip} from "@mui/material";
+import {Button, FormControl, FormControlLabel, Grid, ListItem, ListItemIcon, MenuItem, Select, Stack, TextField, Tooltip} from "@mui/material";
 import ListSubheader from "@mui/material/ListSubheader";
 import {Controller, useFieldArray, useForm} from "react-hook-form";
 import List from "@mui/material/List";
@@ -13,7 +13,7 @@ import {useRouter} from "next/router";
 import {findIndex, head, sumBy} from "lodash";
 import {Loading} from "./Loading";
 import {LoadingButton} from "@mui/lab";
-import {Calculate, PersonAdd} from "@mui/icons-material";
+import {Calculate, EmojiEvents, Error, Pause, PersonAdd, Visibility, VisibilityOff} from "@mui/icons-material";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import {usePlayers, useRounds, useRoundScores, useSettings} from "./useDb";
@@ -41,6 +41,13 @@ export interface Round {
 type ScoresProps = GameIdProp & {
     roundId: string | undefined
 };
+
+const statusIcons = {
+    [PlayerRoundStatus.UNSEEN]: <VisibilityOff fontSize="small" color="inherit"/>,
+    [PlayerRoundStatus.SEEN]: <Visibility fontSize="small" color="success"/>,
+    [PlayerRoundStatus.FOUL]: <Error fontSize="small" color="error"/>,
+    [PlayerRoundStatus.PAUSE]: <Pause fontSize="small" color="disabled"/>,
+}
 
 export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
     const router = useRouter();
@@ -83,7 +90,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
         scores: getDefaultScores(),
     }), [round, getDefaultScores]);
 
-    const {handleSubmit, register, control, reset, setValue, getValues, formState: {errors}} =
+    const {handleSubmit, register, control, reset, setValue, getValues, watch, formState: {errors}} =
         useForm<Round>({
             defaultValues: getDefaultValues()
         });
@@ -268,70 +275,98 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                         <ListItem
                             key={field.id}
                         >
-                            <ListItemText
-                                primary={players && players[index]?.name}
-                                sx={{width: '10ch'}}
-                            />
-                            <Stack direction="row" spacing={2} sx={{width: 1}}>
-                                <Controller
-                                    name={`scores.${index}.maal` as const}
-                                    control={control}
-                                    render={({field}) =>
-                                        <TextField
-                                            inputProps={{style: {textAlign: "center"}}}
-                                            sx={{width: '9ch', textAlign: 'center'}}
-                                            label="Maal"
-                                            type="number"
-                                            size="small"
-                                            required
-                                            variant={readOnly ? "filled" : "outlined"}
-                                            InputProps={{
-                                                readOnly,
-                                            }}
-                                            {...register(`scores.${index}.maal` as const, {min: 0, valueAsNumber: true, required: true})}
-                                            onChange={(event) => {
-                                                field.onChange(event);
-                                                const {value} = event.target;
-                                                if (parseInt(value) > 0) {
-                                                    changeStatusToSeen(index);
-                                                }
-                                            }}
-                                            error={!!(errors?.scores && errors.scores[index]?.maal)}
-                                        />
-                                    }
-                                />
-                                <FormControl size="small" sx={{width: 1 / 2}}>
+                            <Grid container>
+                                <Grid item xs={3}>
+                                    <ListItemText
+                                        primary={players && players[index]?.name}
+                                        sx={{width: '10ch'}}
+                                    />
+                                </Grid>
+                                <Grid item xs={1}>
+                                    <ListItemIcon sx={{alignItems: "center", justifyContent:"left"}}>
+                                        {
+                                            players && players[index].id === watch("winnerPlayerId")
+                                            &&
+                                            <EmojiEvents color="success"/>
+                                        }
+                                    </ListItemIcon>
+                                </Grid>
+                                <Grid item xs={3}>
                                     <Controller
-                                        name={`scores.${index}.status` as const}
+                                        name={`scores.${index}.maal` as const}
                                         control={control}
                                         render={({field}) =>
-                                            <Select
-                                                {...field}
-                                                {...register(`scores.${index}.status` as const, {required: true})}
+                                            <TextField
+                                                inputProps={{style: {textAlign: "center"}}}
+                                                sx={{width: '9ch', textAlign: 'center'}}
+                                                label="Maal"
+                                                type="number"
+                                                size="small"
+                                                required
+                                                variant={readOnly ? "filled" : "outlined"}
+                                                InputProps={{
+                                                    readOnly,
+                                                }}
+                                                {...register(`scores.${index}.maal` as const, {min: 0, valueAsNumber: true, required: true})}
                                                 onChange={(event) => {
                                                     field.onChange(event);
-                                                    const status = event.target.value;
-                                                    onStatusChange(index, status as PlayerRoundStatus);
+                                                    const {value} = event.target;
+                                                    if (parseInt(value) > 0) {
+                                                        changeStatusToSeen(index);
+                                                    }
                                                 }}
-                                                readOnly={readOnly}
-                                                variant={readOnly ? "filled" : "outlined"}
-                                                error={!!(errors?.scores && errors.scores[index]?.status)}
-                                            >
-                                                {
-                                                    Object.values(PlayerRoundStatus)
-                                                        .map(status =>
-                                                            <MenuItem
-                                                                key={status}
-                                                                value={status}>
-                                                                {status}
-                                                            </MenuItem>
-                                                        )
-                                                }
-                                            </Select>
+                                                error={!!(errors?.scores && errors.scores[index]?.maal)}
+                                            />
                                         }
                                     />
-                                </FormControl>
-                            </Stack>
+                                </Grid>
+                                <Grid item xs={5}>
+                                    <FormControl size="small" sx={{px:1}}>
+                                        <Controller
+                                            name={`scores.${index}.status` as const}
+                                            control={control}
+                                            render={({field}) =>
+                                                <Select
+                                                    fullWidth
+                                                    {...field}
+                                                    {...register(`scores.${index}.status` as const, {required: true})}
+                                                    onChange={(event) => {
+                                                        field.onChange(event);
+                                                        const status = event.target.value;
+                                                        onStatusChange(index, status as PlayerRoundStatus);
+                                                    }}
+                                                    readOnly={readOnly}
+                                                    variant={readOnly ? "filled" : "outlined"}
+                                                    error={!!(errors?.scores && errors.scores[index]?.status)}
+                                                    renderValue={(value) =>
+                                                        <MenuItem dense disableGutters>
+                                                            <ListItemIcon>
+                                                                {statusIcons[value]}
+                                                            </ListItemIcon>
+                                                            <ListItemText>{value}</ListItemText>
+                                                        </MenuItem>
+                                                    }
+                                                >
+                                                    {
+                                                        Object.values(PlayerRoundStatus)
+                                                            .map(status =>
+                                                                <MenuItem
+                                                                    key={status}
+                                                                    value={status}
+                                                                >
+                                                                    <ListItemIcon>
+                                                                        {statusIcons[status]}
+                                                                    </ListItemIcon>
+                                                                    <ListItemText>{status}</ListItemText>
+                                                                </MenuItem>
+                                                            )
+                                                    }
+                                                </Select>
+                                            }
+                                        />
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
                         </ListItem>
                     )
                 }
