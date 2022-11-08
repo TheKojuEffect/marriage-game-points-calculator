@@ -13,7 +13,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {DbPlayer, DbRound} from "./db";
 import Box from "@mui/material/Box";
-import {Button, Stack, TextField} from "@mui/material";
+import {Button, InputAdornment, Stack, TextField} from "@mui/material";
 import {mergeWith} from "lodash";
 import Link from "next/link";
 import {useSettings} from "./useSettings";
@@ -21,6 +21,8 @@ import {useGame} from "./useGame";
 import {encode} from "./codec";
 import {useRouter} from "next/router";
 import {GameData} from "./Share";
+import IconButton from "@mui/material/IconButton";
+import {ContentCopy, ContentCopyTwoTone} from "@mui/icons-material";
 
 type PlayerPoints = Record<string, number>;
 type RoundPlayerPoints = Record<string, PlayerPoints>;
@@ -34,6 +36,7 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
 
     const router = useRouter();
     const [shareUrl, setShareUrl] = useState('');
+    const [shareUrlCopied, setShareUrlCopied] = useState(false);
 
     if (!game || !rounds || !scores || !players || !settings) {
         return <Loading/>;
@@ -71,6 +74,11 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
         } else {
             setShareUrl(url);
         }
+    }
+
+    const copyShareUrl = async () => {
+        await navigator.clipboard.writeText(shareUrl)
+        setShareUrlCopied(true);
     }
 
     return (
@@ -122,11 +130,24 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
 
                 {
                     shareUrl &&
-                    <TextField variant="outlined"
-                               label="Share the URL to continue in another device"
-                               multiline
-                               maxRows={2}
-                               InputProps={{readOnly: true}} defaultValue={shareUrl}/>
+                    <TextField
+                        variant="filled"
+                        label="Share the URL to continue in another device"
+                        defaultValue={shareUrl}
+                        InputProps={{
+                            readOnly: true,
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        onClick={copyShareUrl}
+                                        edge="end"
+                                    >
+                                        {shareUrlCopied ? <ContentCopyTwoTone/> : <ContentCopy/>}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
                 }
 
             </Stack>
