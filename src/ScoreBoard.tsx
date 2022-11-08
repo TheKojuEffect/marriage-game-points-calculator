@@ -140,6 +140,7 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                                 <InputAdornment position="end">
                                     <IconButton
                                         onClick={copyShareUrl}
+                                        title={`${shareUrlCopied ? "Copied" : "Copy"} to Clipboard`}
                                         edge="end"
                                     >
                                         {shareUrlCopied ? <ContentCopyTwoTone/> : <ContentCopy/>}
