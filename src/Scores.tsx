@@ -2,7 +2,21 @@ import {FC, useCallback, useEffect, useState} from "react";
 import {GameIdProp} from "./GameIdProp";
 import {db, DbRound, DbScore} from "./db";
 import Box from "@mui/material/Box";
-import {Button, FormControl, FormControlLabel, Grid, ListItem, ListItemIcon, MenuItem, Select, Stack, TextField, Tooltip} from "@mui/material";
+import {
+    Button,
+    FormControl,
+    FormControlLabel,
+    Grid,
+    Input,
+    InputAdornment,
+    ListItem, ListItemButton,
+    ListItemIcon,
+    MenuItem,
+    Select,
+    Stack,
+    TextField,
+    Tooltip
+} from "@mui/material";
 import ListSubheader from "@mui/material/ListSubheader";
 import {Controller, useFieldArray, useForm} from "react-hook-form";
 import List from "@mui/material/List";
@@ -13,11 +27,12 @@ import {useRouter} from "next/router";
 import {findIndex, head, sumBy} from "lodash";
 import {Loading} from "./Loading";
 import {LoadingButton} from "@mui/lab";
-import {Calculate, EmojiEvents, Error, Pause, PersonAdd, Visibility, VisibilityOff} from "@mui/icons-material";
+import {Calculate, ContentCopy, ContentCopyTwoTone, EmojiEvents, Error, Pause, PersonAdd, Visibility, VisibilityOff} from "@mui/icons-material";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import {usePlayers, useRounds, useRoundScores, useSettings} from "./useDb";
 import {generateId} from "./utils";
+import IconButton from "@mui/material/IconButton";
 
 export enum PlayerRoundStatus {
     UNSEEN = "Unseen",
@@ -271,25 +286,28 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                 </ListItem>
                 {
                     fields.map((field, index) =>
-
                         <ListItem
                             key={field.id}
+                            disableGutters
                         >
-                            <Grid container>
-                                <Grid item xs={3}>
+                            <Grid container alignItems="center" justifyContent="center">
+                                <Grid item xs={2}>
                                     <ListItemText
                                         primary={players && players[index]?.name}
-                                        sx={{width: '10ch'}}
+                                        sx={{width: '10ch', textAlign: 'center'}}
+
                                     />
                                 </Grid>
-                                <Grid item xs={1}>
-                                    <ListItemIcon sx={{alignItems: "center", justifyContent:"left"}}>
-                                        {
-                                            players && players[index].id === watch("winnerPlayerId")
-                                            &&
-                                            <EmojiEvents color="success"/>
-                                        }
-                                    </ListItemIcon>
+                                <Grid item xs={2}>
+                                    <ListItemButton>
+                                        <ListItemIcon>
+                                            {
+                                                players && players[index].id === watch("winnerPlayerId")
+                                                &&
+                                                <EmojiEvents color="success"/>
+                                            }
+                                        </ListItemIcon>
+                                    </ListItemButton>
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Controller
@@ -321,7 +339,7 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                                     />
                                 </Grid>
                                 <Grid item xs={5}>
-                                    <FormControl size="small" sx={{px:1}}>
+                                    <FormControl size="small" sx={{px: 1}}>
                                         <Controller
                                             name={`scores.${index}.status` as const}
                                             control={control}
@@ -338,13 +356,22 @@ export const Scores: FC<ScoresProps> = ({gameId, roundId}) => {
                                                     readOnly={readOnly}
                                                     variant={readOnly ? "filled" : "outlined"}
                                                     error={!!(errors?.scores && errors.scores[index]?.status)}
-                                                    renderValue={(value) =>
-                                                        <MenuItem dense disableGutters>
-                                                            <ListItemIcon>
-                                                                {statusIcons[value]}
-                                                            </ListItemIcon>
-                                                            <ListItemText>{value}</ListItemText>
-                                                        </MenuItem>
+                                                    renderValue={(status) =>
+                                                        <Input
+                                                            defaultValue={status}
+                                                            size="small"
+                                                            disableUnderline
+                                                            fullWidth
+                                                            startAdornment={
+                                                                <InputAdornment position="start">
+                                                                    <IconButton
+                                                                        edge="start"
+                                                                    >
+                                                                        {statusIcons[status]}
+                                                                    </IconButton>
+                                                                </InputAdornment>
+                                                            }
+                                                        />
                                                     }
                                                 >
                                                     {
