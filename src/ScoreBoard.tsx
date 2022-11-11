@@ -101,8 +101,13 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                                         key={player.id}
                                         align="center"
                                         size="small"
+                                        sx={{
+                                            px:0,
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                        }}
                                     >
-                                        {player.name.substring(0, 4)}
+                                        {player.name}
                                     </TableCell>
                                 )
                             }
@@ -221,8 +226,13 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                                     <TableCell
                                         key={player.id}
                                         align="center"
+                                        sx={{
+                                            px:0,
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                        }}
                                     >
-                                        {player.name.substring(0, 4)}
+                                        {player.name}
                                     </TableCell>
                                 )
                             }
@@ -255,5 +265,6 @@ export const ScoreBoard: FC<GameIdProp> = ({gameId}) => {
                 </Table>
             </TableContainer>
         </>
-    );
+    )
+        ;
 }
